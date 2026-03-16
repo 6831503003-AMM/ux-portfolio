@@ -1,0 +1,2477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Facebook Privacy Redesign — UX Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Instrument+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cream: #f5f0e8;
+  --ivory: #faf7f2;
+  --parchment: #ede8dc;
+  --terra: #c4622d;
+  --terra-light: #e8845a;
+  --amber: #d4952a;
+  --deep: #1e1a14;
+  --brown: #3d2f1f;
+  --muted: #8a7968;
+  --warm-border: rgba(62,47,31,0.12);
+  --card-bg: #ffffff;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Instrument Sans', sans-serif;
+  background: var(--ivory);
+  color: var(--deep);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+}
+.bg-blob { position: fixed; border-radius: 50%; filter: blur(90px); pointer-events: none; z-index: 0; }
+.blob-1 { width: 700px; height: 700px; background: rgba(196,98,45,0.07); top: -250px; right: -200px; }
+.blob-2 { width: 550px; height: 550px; background: rgba(212,149,42,0.05); bottom: -150px; left: -150px; }
+
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(250,247,242,0.95);
+  backdrop-filter: blur(24px);
+  border-bottom: 1px solid var(--warm-border);
+  padding: 0 40px;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 60px;
+  box-shadow: 0 1px 0 var(--warm-border), 0 4px 20px rgba(30,26,20,0.04);
+}
+.nav-brand { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; color: var(--terra); }
+.nav-links { display: flex; gap: 4px; }
+.nav-links a {
+  font-size: 0.7rem; color: var(--muted); text-decoration: none;
+  padding: 7px 14px; border-radius: 10px; transition: all 0.2s;
+  font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;
+  position: relative;
+}
+.nav-links a:hover { color: var(--deep); background: var(--parchment); }
+.nav-links a.nav-active {
+  color: var(--terra);
+  background: rgba(196,98,45,0.08);
+}
+.nav-links a.nav-active::after {
+  content: ''; position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%);
+  width: 16px; height: 2px; background: var(--terra); border-radius: 2px;
+}
+
+.hero {
+  position: relative; z-index: 1;
+  padding: 100px 40px 80px;
+  max-width: 1100px; margin: 0 auto;
+  display: grid; grid-template-columns: 1fr auto;
+  align-items: end; gap: 40px;
+}
+.hero-eyebrow { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+.eyebrow-line { width: 40px; height: 1.5px; background: var(--terra); }
+.eyebrow-text { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--terra); }
+h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2.8rem, 6vw, 5rem);
+  font-weight: 900; line-height: 1.02;
+  color: var(--deep); margin-bottom: 24px; letter-spacing: -0.02em;
+}
+h1 em { font-style: italic; color: var(--terra); }
+.hero-desc { font-size: 1rem; color: var(--muted); max-width: 480px; line-height: 1.75; font-weight: 300; }
+.hero-tags { display: flex; gap: 8px; flex-direction: column; align-items: flex-end; }
+.h-tag { background: var(--parchment); color: var(--brown); font-size: 0.72rem; font-weight: 600; padding: 7px 16px; border-radius: 20px; letter-spacing: 0.03em; white-space: nowrap; }
+.h-tag.accent { background: var(--terra); color: white; }
+
+.divider { height: 1px; background: var(--warm-border); max-width: calc(1100px - 80px); margin: 0 auto; position: relative; z-index: 1; }
+
+.section-wrap { max-width: 1100px; margin: 0 auto; padding: 80px 40px; position: relative; z-index: 1; }
+.section-header { display: grid; grid-template-columns: auto 1fr; align-items: baseline; gap: 20px; margin-bottom: 48px; }
+.section-num { font-family: 'Playfair Display', serif; font-size: 3.5rem; font-weight: 900; color: rgba(196,98,45,0.28); line-height: 1; letter-spacing: -0.03em; user-select: none; }
+.section-kicker { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--terra); margin-bottom: 6px; }
+h2 { font-family: 'Playfair Display', serif; font-size: clamp(1.6rem, 3.5vw, 2.4rem); font-weight: 700; line-height: 1.15; color: var(--deep); }
+.section-desc { color: var(--muted); font-size: 0.9rem; line-height: 1.7; margin-top: 10px; font-weight: 300; max-width: 560px; }
+
+.pain-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 16px; margin-bottom: 28px; }
+@media(max-width:700px){.pain-grid{grid-template-columns:1fr;}}
+.pain-card {
+  background: var(--card-bg); border: 1px solid var(--warm-border);
+  border-radius: 16px; padding: 28px; position: relative; overflow: hidden;
+  transition: transform 0.25s, box-shadow 0.25s;
+  box-shadow: 0 2px 12px rgba(30,26,20,0.05);
+}
+.pain-card:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(30,26,20,0.1); }
+.pain-card-accent { position: absolute; top: 0; left: 0; right: 0; height: 3px; border-radius: 16px 16px 0 0; }
+.c1 .pain-card-accent { background: linear-gradient(90deg,#c4622d,#e8845a); }
+.c2 .pain-card-accent { background: linear-gradient(90deg,#d4952a,#f0b84a); }
+.c3 .pain-card-accent { background: linear-gradient(90deg,#5b9a6e,#7ec49a); }
+.c4 .pain-card-accent { background: linear-gradient(90deg,#7c6aad,#a593d2); }
+.pain-num { font-size: 0.7rem; font-weight: 600; color: var(--muted); margin-bottom: 10px; opacity: 0.6; letter-spacing: 0.06em; text-transform: uppercase; }
+.pain-title { font-family: 'Playfair Display', serif; font-size: 1.05rem; font-weight: 700; color: var(--deep); margin-bottom: 12px; line-height: 1.3; }
+.pain-trigger { font-size: 0.83rem; color: var(--muted); line-height: 1.65; margin-bottom: 20px; font-weight: 300; }
+.pain-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.emotion-chip { font-size: 0.7rem; font-weight: 600; padding: 4px 12px; border-radius: 20px; background: var(--parchment); color: var(--brown); }
+.sev-chip { font-size: 0.68rem; font-weight: 600; padding: 4px 10px; border-radius: 10px; }
+.sev-med { background: rgba(212,149,42,0.12); color: #a5720a; }
+.sev-low { background: rgba(91,154,110,0.12); color: #3a7d52; }
+
+.reflection {
+  background: linear-gradient(135deg, var(--terra) 0%, #a34d20 100%);
+  border-radius: 16px; padding: 40px 44px; position: relative; overflow: hidden;
+  box-shadow: 0 8px 40px rgba(196,98,45,0.25);
+}
+.reflection::before {
+  content: '\201C'; position: absolute; top: -20px; left: 30px;
+  font-family: 'Playfair Display', serif; font-size: 12rem;
+  color: rgba(255,255,255,0.08); line-height: 1; pointer-events: none;
+}
+.reflection-text { font-size: 1rem; line-height: 1.85; color: rgba(255,255,255,0.95); font-weight: 400; max-width: 680px; position: relative; }
+.reflection-attr { margin-top: 20px; font-size: 0.72rem; color: rgba(255,255,255,0.5); font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; }
+
+.val-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+@media(max-width:700px){.val-grid{grid-template-columns:1fr;}}
+.val-card { background: var(--card-bg); border: 1px solid var(--warm-border); border-radius: 16px; padding: 30px; box-shadow: 0 2px 12px rgba(30,26,20,0.04); }
+.val-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1rem; margin-bottom: 16px; }
+.val-icon.o { background: rgba(196,98,45,0.12); }
+.val-icon.a { background: rgba(212,149,42,0.12); }
+.val-card h3 { font-family: 'Playfair Display', serif; font-size: 0.95rem; font-weight: 700; margin-bottom: 16px; color: var(--deep); }
+.val-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.val-list li { font-size: 0.82rem; color: var(--muted); display: flex; gap: 10px; line-height: 1.55; font-weight: 300; }
+.val-list li::before { content: '→'; color: var(--terra); flex-shrink: 0; font-weight: 600; }
+
+.hmw-card { background: var(--parchment); border-radius: 16px; padding: 32px 36px; border-left: 4px solid var(--terra); }
+.hmw-label { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--terra); margin-bottom: 14px; }
+.hmw-text { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--deep); line-height: 1.65; font-weight: 600; }
+
+.wf-outer { background: var(--card-bg); border: 1px solid var(--warm-border); border-radius: 20px; overflow: hidden; box-shadow: 0 4px 30px rgba(30,26,20,0.08); }
+.wf-bar { background: var(--parchment); border-bottom: 1px solid var(--warm-border); padding: 14px 20px; display: flex; align-items: center; gap: 12px; }
+.wf-dots { display: flex; gap: 6px; }
+.wd { width: 10px; height: 10px; border-radius: 50%; }
+.wd.r { background: #e06060; } .wd.y { background: #d4a040; } .wd.g { background: #5a9a6e; }
+.wf-bar-title { font-size: 0.75rem; color: var(--muted); font-weight: 500; margin-left: 6px; }
+.wf-inner { padding: 28px; }
+
+.mock-app { display: flex; background: #f0f2f5; border-radius: 12px; overflow: hidden; height: 380px; }
+.mock-sidebar { width: 190px; background: white; padding: 16px 0; border-right: 1px solid #e4e6eb; flex-shrink: 0; display: flex; flex-direction: column; }
+.mock-logo { display: flex; align-items: center; gap: 8px; padding: 0 16px 16px; border-bottom: 1px solid #e4e6eb; margin-bottom: 10px; }
+.fb-icon { width: 30px; height: 30px; background: #1877f2; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 900; font-size: 0.9rem; }
+.fb-word { font-weight: 700; font-size: 0.9rem; color: #1877f2; }
+.sb-item { display: flex; align-items: center; gap: 10px; padding: 10px 16px; font-size: 0.78rem; color: #65676b; cursor: pointer; transition: background 0.15s; }
+.sb-item:hover { background: #f0f2f5; }
+.sb-item.active { background: #e7f0fe; color: #1877f2; font-weight: 600; }
+.sb-spacer { flex: 1; }
+.mock-main { flex: 1; padding: 28px 24px; display: flex; flex-direction: column; align-items: center; overflow-y: auto; text-align: center; }
+.fb-avatar { width: 56px; height: 56px; background: linear-gradient(135deg,#1877f2,#0d5bc4); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 900; font-size: 1.5rem; margin-bottom: 16px; box-shadow: 0 4px 20px rgba(24,119,242,0.3); }
+.mock-title { font-size: 1.25rem; font-weight: 700; color: #1c1e21; margin-bottom: 6px; }
+.mock-sub { font-size: 0.74rem; color: #65676b; margin-bottom: 22px; line-height: 1.5; max-width: 300px; }
+.mock-cards-row { display: flex; gap: 12px; margin-bottom: 18px; width: 100%; max-width: 340px; }
+.mock-card { flex: 1; background: white; border-radius: 12px; padding: 18px 14px; text-align: center; border: 2px solid transparent; cursor: pointer; transition: all 0.15s; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+.mock-card:hover { border-color: #1877f2; }
+.mock-card.sel { border-color: #1877f2; background: #e7f0fe; }
+.mc-icon { font-size: 1.3rem; margin-bottom: 6px; }
+.mc-label { font-size: 0.71rem; font-weight: 700; color: #1c1e21; }
+.mock-banner { background: white; border-radius: 12px; padding: 14px 16px; display: flex; align-items: flex-start; gap: 10px; width: 100%; max-width: 340px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); text-align: left; }
+.mb-icon { font-size: 0.95rem; margin-top: 1px; }
+.mb-tag { font-size: 0.6rem; font-weight: 700; color: #1877f2; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 2px; }
+.mb-text { font-size: 0.69rem; color: #1c1e21; line-height: 1.5; }
+
+.checklist-wrap { background: var(--card-bg); border: 1px solid var(--warm-border); border-radius: 20px; overflow: hidden; box-shadow: 0 2px 16px rgba(30,26,20,0.05); }
+.cl-head { background: var(--parchment); padding: 18px 28px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--warm-border); }
+.cl-head-title { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; color: var(--deep); }
+.cl-progress { font-size: 0.75rem; color: var(--terra); font-weight: 600; }
+.cl-item { display: flex; align-items: flex-start; gap: 16px; padding: 20px 28px; border-bottom: 1px solid var(--warm-border); cursor: pointer; transition: background 0.15s; }
+.cl-item:last-child { border-bottom: none; }
+.cl-item:hover { background: var(--ivory); }
+.cl-box { width: 22px; height: 22px; border-radius: 7px; border: 2px solid var(--warm-border); flex-shrink: 0; margin-top: 1px; display: flex; align-items: center; justify-content: center; font-size: 0.72rem; transition: all 0.2s; }
+.cl-box.done { background: var(--terra); border-color: var(--terra); color: white; }
+.cl-box.partial { background: var(--amber); border-color: var(--amber); color: white; }
+.cl-label { font-size: 0.88rem; font-weight: 600; color: var(--deep); margin-bottom: 4px; }
+.cl-desc { font-size: 0.78rem; color: var(--muted); line-height: 1.55; font-weight: 300; }
+
+footer { border-top: 1px solid var(--warm-border); padding: 36px 40px; display: flex; align-items: center; justify-content: space-between; max-width: 1100px; margin: 0 auto; position: relative; z-index: 1; }
+.footer-brand { font-family: 'Playfair Display', serif; font-size: 0.9rem; font-weight: 700; color: var(--terra); }
+.footer-text { font-size: 0.75rem; color: var(--muted); }
+
+.proto-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  margin-top: 16px;
+  background: var(--terra); color: white;
+  font-size: 0.78rem; font-weight: 600;
+  padding: 10px 20px; border-radius: 24px;
+  text-decoration: none;
+  transition: background 0.2s, transform 0.2s;
+  letter-spacing: 0.02em;
+}
+.proto-btn:hover { background: #a34d20; transform: translateY(-1px); }
+
+.qs-card {
+  background: white; border-radius: 10px;
+  padding: 12px 10px; text-align: center;
+  border: 2px solid transparent;
+  cursor: pointer; transition: all 0.15s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+}
+.qs-card:hover { border-color: #1877f2; }
+.qs-card.qs-active { border-color: #1877f2; background: #e7f0fe; }
+.qs-icon { font-size: 1.1rem; margin-bottom: 4px; }
+.qs-label { font-size: 0.68rem; font-weight: 700; color: #1c1e21; margin-bottom: 2px; }
+.qs-sub { font-size: 0.6rem; color: #65676b; line-height: 1.3; }
+
+/* CLD Diagram */
+.cld-wrap {
+  background: var(--card-bg); border: 1px solid var(--warm-border);
+  border-radius: 20px; padding: 40px; position: relative;
+  box-shadow: 0 4px 30px rgba(30,26,20,0.06);
+  display: flex; flex-direction: column; align-items: center;
+}
+.cld-node {
+  border: 2px solid var(--deep); border-radius: 8px;
+  padding: 10px 22px; font-size: 0.82rem; font-weight: 600;
+  text-align: center; background: white; position: relative;
+  min-width: 200px; color: var(--deep);
+}
+.cld-node.oval { border-radius: 50px; background: var(--parchment); }
+.cld-node.highlight { background: var(--terra); color: white; border-color: var(--terra); }
+.cld-node sub { font-size: 0.65rem; font-weight: 400; color: var(--muted); display: block; margin-top: 2px; }
+.cld-node.highlight sub { color: rgba(255,255,255,0.7); }
+.cld-arrow {
+  display: flex; flex-direction: column; align-items: center;
+  color: var(--muted); font-size: 0.7rem; font-weight: 600;
+  gap: 0;
+}
+.cld-arrow-line { width: 2px; height: 28px; background: var(--muted); }
+.cld-arrow-head { font-size: 0.9rem; color: var(--muted); margin-top: -4px; }
+.cld-label { font-size: 0.68rem; font-weight: 700; color: var(--terra); }
+.cld-row { display: flex; align-items: center; gap: 20px; justify-content: center; width: 100%; }
+.cld-side { display: flex; flex-direction: column; align-items: center; gap: 0; }
+.cld-connector {
+  width: 180px; height: 2px; background: var(--muted);
+  position: relative;
+}
+.cld-connector::after { content: '→'; position: absolute; right: -10px; top: -9px; color: var(--muted); font-size: 1rem; }
+.cld-connector-left::after { content: '←'; left: -10px; right: auto; }
+.cld-loop-label { font-size: 0.72rem; color: var(--amber); font-weight: 700; text-align: center; margin-top: 4px; }
+
+/* Persona */
+.persona-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media(max-width:700px){.persona-grid{grid-template-columns:1fr;}}
+.persona-card {
+  background: var(--card-bg); border: 1px solid var(--warm-border);
+  border-radius: 20px; overflow: hidden;
+  box-shadow: 0 4px 24px rgba(30,26,20,0.06);
+}
+.persona-header {
+  background: linear-gradient(135deg, var(--terra), #a34d20);
+  padding: 28px 28px 24px;
+  position: relative; overflow: hidden;
+}
+.persona-header::before {
+  content: ''; position: absolute; bottom: -30px; right: -30px;
+  width: 120px; height: 120px; border-radius: 50%;
+  background: rgba(255,255,255,0.06);
+}
+.persona-avatar {
+  width: 56px; height: 56px; border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.6rem; margin-bottom: 14px;
+  border: 2px solid rgba(255,255,255,0.3);
+}
+.persona-name { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 700; color: white; margin-bottom: 4px; }
+.persona-role { font-size: 0.78rem; color: rgba(255,255,255,0.7); font-weight: 400; }
+.persona-body { padding: 24px 28px; }
+.persona-section { margin-bottom: 20px; }
+.persona-section:last-child { margin-bottom: 0; }
+.persona-section-title {
+  font-size: 0.68rem; font-weight: 700; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--terra); margin-bottom: 10px;
+}
+.persona-section p { font-size: 0.83rem; color: var(--muted); line-height: 1.6; font-weight: 300; }
+.persona-list { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+.persona-list li { font-size: 0.82rem; color: var(--muted); display: flex; gap: 8px; line-height: 1.5; font-weight: 300; }
+.persona-list li::before { content: '•'; color: var(--terra); font-weight: 700; flex-shrink: 0; }
+
+/* Empathy map */
+.empathy-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.empathy-quadrant {
+  background: var(--card-bg); border: 1px solid var(--warm-border);
+  border-radius: 16px; padding: 24px;
+  box-shadow: 0 2px 12px rgba(30,26,20,0.04);
+  position: relative; overflow: hidden;
+}
+.empathy-quadrant::before {
+  content: attr(data-icon);
+  position: absolute; top: -8px; right: 16px;
+  font-size: 3.5rem; opacity: 0.07; line-height: 1;
+}
+.eq-label {
+  font-size: 0.68rem; font-weight: 700; letter-spacing: 0.15em;
+  text-transform: uppercase; margin-bottom: 12px;
+  display: flex; align-items: center; gap: 8px;
+}
+.eq-icon { font-size: 1rem; }
+.eq-label.says { color: #1877f2; }
+.eq-label.thinks { color: var(--amber); }
+.eq-label.does { color: #5b9a6e; }
+.eq-label.feels { color: var(--terra); }
+.eq-item {
+  font-size: 0.82rem; color: var(--brown); font-style: normal;
+  font-weight: 500;
+  border-left: 2px solid var(--warm-border); padding-left: 12px;
+  margin-bottom: 10px; line-height: 1.55; font-weight: 300;
+}
+.eq-item:last-child { margin-bottom: 0; }
+.feels-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.feels-chip {
+  padding: 6px 14px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;
+}
+.feels-chip.overwhelmed { background: rgba(196,98,45,0.12); color: var(--terra); }
+.feels-chip.confused { background: rgba(212,149,42,0.12); color: #a5720a; }
+.feels-chip.frustrated { background: rgba(239,68,68,0.1); color: #c53030; }
+
+/* MVP section */
+.mvp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+@media(max-width:700px){.mvp-grid{grid-template-columns:1fr;}}
+.mvp-card {
+  background: var(--card-bg); border: 1px solid var(--warm-border);
+  border-radius: 16px; padding: 28px;
+  box-shadow: 0 2px 12px rgba(30,26,20,0.04);
+}
+.mvp-card-title {
+  font-size: 0.68rem; font-weight: 700; letter-spacing: 0.14em;
+  text-transform: uppercase; margin-bottom: 16px;
+  display: flex; align-items: center; gap: 8px;
+}
+.mvp-card-title.must { color: #5b9a6e; }
+.mvp-card-title.wont { color: var(--muted); }
+.mvp-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 0; border-bottom: 1px solid var(--warm-border);
+  font-size: 0.83rem; font-weight: 400;
+}
+.mvp-item:last-child { border-bottom: none; }
+.mvp-tick {
+  width: 20px; height: 20px; border-radius: 6px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.72rem;
+}
+.mvp-tick.yes { background: rgba(91,154,110,0.15); color: #3a7d52; }
+.mvp-tick.no { background: var(--parchment); color: var(--muted); font-size: 0.8rem; }
+
+/* Sitemap */
+.sitemap-wrap {
+  background: var(--card-bg); border: 1px solid var(--warm-border);
+  border-radius: 16px; padding: 36px;
+  box-shadow: 0 2px 12px rgba(30,26,20,0.04);
+  margin-bottom: 16px; overflow-x: auto;
+}
+.sitemap { display: flex; flex-direction: column; align-items: center; gap: 0; min-width: 600px; }
+.sm-level { display: flex; gap: 16px; justify-content: center; }
+.sm-node {
+  background: var(--parchment); border: 1.5px solid var(--warm-border);
+  border-radius: 8px; padding: 8px 16px;
+  font-size: 0.78rem; font-weight: 600; color: var(--deep);
+  text-align: center; white-space: nowrap;
+}
+.sm-node.root { background: var(--terra); color: white; border-color: var(--terra); font-size: 0.88rem; padding: 10px 24px; }
+.sm-node.sub { background: white; font-size: 0.72rem; font-weight: 500; color: var(--muted); }
+.sm-line-v { width: 2px; height: 24px; background: var(--warm-border); margin: 0 auto; }
+.sm-line-h {
+  height: 2px; background: var(--warm-border);
+  position: relative; margin-bottom: 0;
+}
+.sm-branches { display: flex; justify-content: center; gap: 0; width: 100%; }
+.sm-branch { display: flex; flex-direction: column; align-items: center; flex: 1; }
+.sm-branch-top { width: 100%; height: 2px; background: var(--warm-border); }
+.sm-branch-left { border-left: 2px solid var(--warm-border); height: 20px; }
+
+/* Happy path */
+.flow-wrap {
+  background: var(--card-bg); border: 1px solid var(--warm-border);
+  border-radius: 20px; padding: 40px 28px;
+  box-shadow: 0 4px 24px rgba(30,26,20,0.06);
+  display: flex; flex-direction: column; align-items: center; gap: 0;
+}
+.flow-node {
+  padding: 11px 28px; border-radius: 8px; font-size: 0.82rem; font-weight: 600;
+  text-align: center; min-width: 200px; border: 2px solid var(--warm-border);
+  background: white; color: var(--deep);
+}
+.flow-node.terminal { border-radius: 50px; background: var(--deep); color: white; border-color: var(--deep); }
+.flow-node.decision { 
+  transform: rotate(45deg); width: 110px; height: 110px;
+  display: flex; align-items: center; justify-content: center;
+  border-color: #1877f2; min-width: unset; padding: 0;
+  background: #e7f0fe;
+}
+.flow-node.decision span { transform: rotate(-45deg); font-size: 0.72rem; font-weight: 700; color: #1877f2; text-align: center; line-height: 1.3; }
+.flow-node.success { background: rgba(91,154,110,0.12); border-color: #5b9a6e; color: #2e6644; }
+.flow-node.error { background: rgba(239,68,68,0.08); border-color: #ef4444; color: #c53030; }
+.flow-arrow { display: flex; flex-direction: column; align-items: center; }
+.flow-arrow-line { width: 2px; height: 28px; background: var(--muted); }
+.flow-arrow-tip { font-size: 0.85rem; color: var(--muted); margin-top: -4px; }
+.flow-label { font-size: 0.68rem; font-weight: 700; color: var(--terra); }
+.flow-branch { display: flex; align-items: flex-start; gap: 28px; justify-content: center; width: 100%; }
+.flow-branch-col { display: flex; flex-direction: column; align-items: center; gap: 0; }
+.flow-h-line { height: 2px; background: var(--muted); width: 60px; margin-top: 50px; }
+
+@keyframes fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
+.fade { opacity:0; animation: fadeUp 0.6s ease forwards; }
+.d1{animation-delay:0.05s} .d2{animation-delay:0.15s} .d3{animation-delay:0.25s} .d4{animation-delay:0.35s}
+
+/* ─── WIREFRAME SECTION ─── */
+.proto-showcase {
+  display: grid; grid-template-columns: 260px 1fr; gap: 48px;
+  align-items: start; margin-bottom: 32px;
+}
+@media(max-width:800px){ .proto-showcase { grid-template-columns: 1fr; } }
+.phone-stage { position: relative; display: flex; justify-content: center; }
+.phone-glow {
+  position: absolute; inset: -20px; border-radius: 50px;
+  background: radial-gradient(ellipse at center, rgba(196,98,45,0.18) 0%, transparent 70%);
+  z-index: 0; pointer-events: none;
+}
+.phone-frame {
+  width: 232px; background: #1a1410;
+  border-radius: 40px; padding: 10px 6px 6px;
+  box-shadow: 0 32px 90px rgba(30,26,20,0.4), 0 0 0 1px rgba(255,255,255,0.05) inset, 0 0 0 6px #0f0d0a;
+  position: relative; z-index: 1; display: flex; flex-direction: column;
+}
+.phone-notch {
+  width: 80px; height: 22px; background: #1a1410;
+  border-radius: 0 0 16px 16px; margin: 0 auto 2px;
+  position: relative; z-index: 2;
+}
+.phone-screen {
+  background: #f0f2f5; border-radius: 32px; overflow: hidden;
+  height: 460px; position: relative;
+}
+.phone-home-bar {
+  width: 80px; height: 4px; background: rgba(255,255,255,0.2);
+  border-radius: 4px; margin: 8px auto 2px;
+}
+.pscreen {
+  position: absolute; inset: 0; display: none; flex-direction: column;
+  opacity: 0; transition: opacity 0.35s ease;
+}
+.pscreen.active { display: flex; opacity: 1; }
+.proto-panel { display: flex; flex-direction: column; gap: 22px; padding-top: 4px; }
+.proto-tabs {
+  display: flex; gap: 5px;
+  background: var(--parchment); border-radius: 14px; padding: 5px;
+}
+.proto-tab {
+  flex: 1; display: flex; align-items: center; gap: 7px;
+  padding: 9px 12px; border-radius: 10px; border: none;
+  background: transparent; cursor: pointer; transition: all 0.2s; text-align: left;
+}
+.proto-tab:hover { background: rgba(196,98,45,0.08); }
+.proto-tab.active { background: white; box-shadow: 0 2px 10px rgba(30,26,20,0.1); }
+.pt-num { font-family: 'Playfair Display', serif; font-size: 0.65rem; font-weight: 700; color: var(--muted); line-height: 1; }
+.proto-tab.active .pt-num { color: var(--terra); }
+.pt-label { font-size: 0.7rem; font-weight: 600; color: var(--muted); }
+.proto-tab.active .pt-label { color: var(--deep); }
+.proto-info { display: none; }
+.proto-info.active { display: block; animation: fadeUp 0.3s ease forwards; }
+.pi-eyebrow { font-size: 0.63rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--terra); margin-bottom: 10px; }
+.pi-title { font-family: 'Playfair Display', serif; font-size: 1.45rem; font-weight: 700; color: var(--deep); line-height: 1.2; margin-bottom: 12px; }
+.pi-body { font-size: 0.84rem; color: var(--muted); line-height: 1.75; font-weight: 300; margin-bottom: 16px; }
+.pi-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 18px; }
+.pi-chip { font-size: 0.66rem; font-weight: 600; padding: 4px 10px; border-radius: 20px; }
+.pi-chip.research { background: rgba(196,98,45,0.1); color: var(--terra); }
+.pi-chip.design { background: var(--parchment); color: var(--brown); }
+.pi-features { display: flex; flex-direction: column; gap: 11px; }
+.pi-feat { display: flex; align-items: flex-start; gap: 12px; font-size: 0.81rem; color: var(--muted); line-height: 1.5; font-weight: 300; }
+.pi-feat strong { color: var(--deep); font-weight: 600; }
+.pi-feat-icon { width: 30px; height: 30px; border-radius: 9px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; }
+.proto-cta { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding-top: 8px; border-top: 1px solid var(--warm-border); }
+.proto-badge { font-size: 0.71rem; color: var(--muted); }
+.design-decisions {
+  background: var(--card-bg); border: 1px solid var(--warm-border);
+  border-radius: 20px; padding: 30px 36px;
+  box-shadow: 0 4px 24px rgba(30,26,20,0.05);
+}
+.dd-label { font-size: 0.63rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--terra); margin-bottom: 18px; }
+.dd-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; }
+@media(max-width:800px){ .dd-grid { grid-template-columns: repeat(2,1fr); } }
+.dd-card {
+  background: var(--ivory); border-radius: 14px; padding: 18px 15px;
+  border: 1px solid var(--warm-border); display: flex; flex-direction: column; gap: 5px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.dd-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(30,26,20,0.08); }
+.dd-from { font-size: 0.66rem; font-weight: 700; color: #c53030; }
+.dd-to { font-size: 0.66rem; font-weight: 700; color: #3a7d52; }
+.dd-arrow { display: none; }
+.dd-arrow-v { font-size: 0.8rem; color: var(--muted); margin: 1px 0; }
+.dd-desc { font-size: 0.76rem; color: var(--muted); line-height: 1.5; font-weight: 300; }
+.dd-desc.after { color: var(--deep); font-weight: 500; }
+
+/* Phase Banners */
+.phase-banner {
+  background: linear-gradient(135deg, var(--deep) 0%, #2d2318 100%);
+  position: relative; z-index: 1;
+  border-top: 3px solid var(--terra);
+}
+.phase-banner-inner {
+  max-width: 1100px; margin: 0 auto; padding: 32px 40px;
+  display: flex; align-items: center; gap: 24px;
+}
+.phase-num {
+  font-family: 'Playfair Display', serif; font-size: 4rem; font-weight: 900;
+  color: rgba(255,255,255,0.08); line-height: 1; flex-shrink: 0;
+}
+.phase-title {
+  font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 700;
+  color: white; line-height: 1;
+}
+.phase-sub {
+  font-size: 0.72rem; color: rgba(255,255,255,0.45); margin-top: 6px;
+  letter-spacing: 0.04em; font-weight: 500;
+}
+
+/* Pain card c5 (Shopee) */
+.c5 .pain-card-accent { background: linear-gradient(90deg,#f97316,#fb923c); }
+.sev-high { background: rgba(239,68,68,0.12); color: #c53030; }
+
+/* 5 Whys */
+.whys-wrap {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 32px;
+  align-items: start;
+  background: var(--card-bg); border: 1px solid var(--warm-border);
+  border-radius: 20px; padding: 40px;
+  box-shadow: 0 4px 30px rgba(30,26,20,0.06);
+}
+@media(max-width:700px){ .whys-wrap { grid-template-columns: 1fr; } }
+.whys-left { display: flex; flex-direction: column; align-items: center; gap: 0; }
+.why-problem-block {
+  background: var(--deep); color: white;
+  border-radius: 10px; padding: 16px 28px; text-align: center; min-width: 220px;
+  box-shadow: 0 4px 16px rgba(30,26,20,0.2);
+}
+.why-problem-label { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--terra); margin-bottom: 4px; }
+.why-problem-text { font-size: 0.88rem; font-weight: 600; line-height: 1.4; }
+.why-arrow-v { width: 2px; height: 26px; background: var(--muted); }
+.why-block {
+  border: 2px solid var(--warm-border); border-radius: 8px;
+  padding: 12px 28px; text-align: center; min-width: 220px;
+  background: white;
+}
+.why-block.root-cause { background: rgba(196,98,45,0.08); border-color: var(--terra); }
+.why-tag { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+.why-tag.root { color: var(--terra); }
+.why-text { font-size: 0.88rem; font-weight: 600; color: var(--deep); line-height: 1.4; }
+.whys-right {
+  background: var(--parchment); border-radius: 14px; padding: 28px;
+  border-left: 4px solid var(--amber);
+}
+.whys-insight-label { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--amber); margin-bottom: 8px; }
+.whys-insight-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; color: var(--deep); margin-bottom: 20px; line-height: 1.3; }
+.whys-insight-chain { display: flex; flex-direction: column; gap: 6px; }
+.wic-item { background: white; border-radius: 8px; padding: 10px 14px; font-size: 0.82rem; color: var(--deep); font-weight: 500; line-height: 1.4; }
+.wic-arrow { font-size: 0.85rem; color: var(--amber); font-weight: 700; text-align: center; padding-left: 14px; }
+
+/* Persona Full */
+.persona-full {
+  background: var(--card-bg); border: 1px solid var(--warm-border);
+  border-radius: 20px; overflow: hidden;
+  box-shadow: 0 4px 30px rgba(30,26,20,0.06);
+}
+.persona-full-header {
+  background: linear-gradient(135deg, var(--terra), #a34d20);
+  padding: 32px 36px; display: flex; align-items: center; gap: 24px;
+}
+.persona-avatar-large {
+  width: 72px; height: 72px; border-radius: 50%;
+  background: rgba(255,255,255,0.2); display: flex; align-items: center;
+  justify-content: center; font-size: 2rem; flex-shrink: 0;
+  border: 2px solid rgba(255,255,255,0.3);
+}
+.pf-name { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 700; color: white; margin-bottom: 4px; }
+.pf-role { font-size: 0.8rem; color: rgba(255,255,255,0.7); margin-bottom: 6px; }
+.pf-char { font-size: 0.84rem; color: rgba(255,255,255,0.9); font-weight: 400; }
+.persona-full-body {
+  display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0;
+}
+@media(max-width:800px){ .persona-full-body { grid-template-columns: 1fr; } }
+.pf-col { padding: 28px 28px; border-right: 1px solid var(--warm-border); }
+.pf-col:last-child { border-right: none; }
+.pf-col-title { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 14px; }
+.pf-col-title.goals { color: #3a7d52; }
+.pf-col-title.frustrations { color: #c53030; }
+.pf-col-title.behaviors { color: #1877f2; }
+.pf-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.pf-list li { font-size: 0.82rem; color: var(--muted); display: flex; gap: 8px; line-height: 1.55; font-weight: 300; }
+.pf-list li::before { content: '→'; color: var(--terra); flex-shrink: 0; font-weight: 600; }
+
+/* POV Card */
+.pov-card {
+  background: var(--card-bg); border: 1px solid var(--warm-border);
+  border-radius: 20px; padding: 40px;
+  box-shadow: 0 4px 30px rgba(30,26,20,0.06);
+}
+.pov-row { display: flex; gap: 0; align-items: stretch; margin-bottom: 32px; }
+@media(max-width:700px){ .pov-row { flex-direction: column; } }
+.pov-block { flex: 1; padding: 20px; }
+.pov-plus { display: flex; align-items: center; font-family: 'Playfair Display',serif; font-size: 1.8rem; color: var(--parchment); padding: 0 4px; }
+.pov-label { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 10px; }
+.pov-label.user-label { color: #3a7d52; }
+.pov-label.need-label { color: #1877f2; }
+.pov-label.insight-label { color: var(--amber); }
+.pov-text { font-size: 0.88rem; color: var(--muted); line-height: 1.7; font-weight: 300; }
+.pov-statement {
+  background: linear-gradient(135deg, var(--terra), #a34d20);
+  border-radius: 14px; padding: 28px 32px;
+  position: relative; overflow: hidden;
+}
+.pov-statement::before {
+  content: '\201C'; position: absolute; top: -30px; left: 20px;
+  font-family: 'Playfair Display', serif; font-size: 10rem;
+  color: rgba(255,255,255,0.07); line-height: 1; pointer-events: none;
+}
+.pov-statement-label { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(255,255,255,0.5); margin-bottom: 10px; position: relative; }
+.pov-statement-text { font-family: 'Playfair Display', serif; font-size: 1.05rem; font-weight: 700; color: white; line-height: 1.75; position: relative; }
+
+/* HMW Grid */
+.hmw-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 32px; }
+@media(max-width:700px){ .hmw-grid { grid-template-columns: 1fr; } }
+.hmw-card-new {
+  background: var(--card-bg); border: 1px solid var(--warm-border);
+  border-radius: 14px; padding: 24px 28px;
+  border-left: 4px solid var(--terra);
+  box-shadow: 0 2px 12px rgba(30,26,20,0.04);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.hmw-card-new:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(30,26,20,0.08); }
+.hmw-card-num { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--terra); margin-bottom: 10px; }
+.hmw-card-q { font-size: 0.95rem; font-weight: 600; color: var(--deep); line-height: 1.7; margin-bottom: 12px; }
+.hmw-card-from { font-size: 0.72rem; color: var(--muted); font-weight: 400; }
+
+/* User Stories */
+.stories-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media(max-width:700px){ .stories-grid { grid-template-columns: 1fr; } }
+.story-card {
+  background: var(--card-bg); border: 1px solid var(--warm-border);
+  border-radius: 16px; padding: 24px 28px;
+  box-shadow: 0 2px 12px rgba(30,26,20,0.04);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.story-card:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(30,26,20,0.08); }
+.story-priority { display: inline-block; font-size: 0.65rem; font-weight: 700; padding: 4px 12px; border-radius: 20px; margin-bottom: 14px; letter-spacing: 0.06em; text-transform: uppercase; }
+.story-priority.must { background: rgba(196,98,45,0.12); color: var(--terra); }
+.story-priority.should { background: rgba(212,149,42,0.12); color: #a5720a; }
+.story-priority.could { background: rgba(91,154,110,0.12); color: #3a7d52; }
+.story-text { font-size: 0.86rem; color: var(--muted); line-height: 1.7; margin-bottom: 18px; font-weight: 300; }
+.story-text strong { color: var(--deep); font-weight: 600; }
+.story-acceptance { border-top: 1px solid var(--warm-border); padding-top: 14px; }
+.story-ac-label { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+.story-ac-item { font-size: 0.78rem; color: var(--muted); margin-bottom: 4px; font-weight: 300; }
+
+.crazy8-card.crazy8-selected {
+  border: 2px solid var(--terra);
+  box-shadow: 0 4px 20px rgba(196,98,45,0.15);
+}
+.crazy8-card.crazy8-selected .crazy8-sketch {
+  background: rgba(196,98,45,0.08);
+}
+.crazy8-badge {
+  font-size: 0.62rem; font-weight: 700; padding: 3px 8px;
+  border-radius: 20px; background: var(--terra); color: white;
+  letter-spacing: 0.04em; white-space: nowrap;
+}
+
+/* SVG Happy Path Flow */
+.flow-svg-wrap {
+  display: flex; justify-content: center;
+  background: #f8f5f0; border-radius: 14px;
+  padding: 24px 16px;
+  border: 1px solid var(--warm-border);
+}
+.flow-svg { width: 100%; max-width: 640px; height: auto; }
+
+/* Single-column 5 Whys */
+.whys-single {
+  display: flex; flex-direction: column; align-items: center; gap: 0;
+  background: var(--card-bg); border: 1px solid var(--warm-border);
+  border-radius: 20px; padding: 48px 40px;
+  box-shadow: 0 4px 30px rgba(30,26,20,0.06);
+  max-width: 500px; margin: 0 auto;
+}
+.why-arrow-v { width: 2px; height: 28px; background: var(--muted); }
+
+/* SVG CLD */
+.cld-svg-wrap {
+  background: #f8f5f0;
+  border: 1px solid var(--warm-border);
+  border-radius: 20px; padding: 36px 24px;
+  box-shadow: 0 4px 30px rgba(30,26,20,0.06);
+  display: flex; justify-content: center;
+}
+.cld-svg { width: 100%; max-width: 700px; height: auto; }
+
+/* Crazy 8s grid */
+.crazy8-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+  margin-bottom: 24px;
+}
+@media(max-width:800px){ .crazy8-grid { grid-template-columns: repeat(2,1fr); } }
+.crazy8-card {
+  background: var(--card-bg); border: 1px solid var(--warm-border);
+  border-radius: 14px; overflow: hidden;
+  box-shadow: 0 2px 12px rgba(30,26,20,0.05);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.crazy8-card:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(30,26,20,0.1); }
+.crazy8-sketch {
+  background: var(--parchment); height: 130px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2.2rem; border-bottom: 1px solid var(--warm-border);
+  position: relative; overflow: hidden;
+}
+.crazy8-sketch::after {
+  content: ''; position: absolute; inset: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 18px, rgba(62,47,31,0.06) 18px, rgba(62,47,31,0.06) 19px);
+}
+.crazy8-body { padding: 14px; }
+.crazy8-num { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--terra); margin-bottom: 4px; }
+.crazy8-title { font-family: 'Playfair Display', serif; font-size: 0.9rem; font-weight: 700; color: var(--deep); margin-bottom: 6px; line-height: 1.3; }
+.crazy8-desc { font-size: 0.75rem; color: var(--muted); line-height: 1.55; font-weight: 300; }
+
+/* Storyboard */
+.storyboard-wrap {
+  background: var(--card-bg); border: 1px solid var(--warm-border);
+  border-radius: 20px; padding: 36px;
+  box-shadow: 0 4px 24px rgba(30,26,20,0.06);
+}
+.storyboard-strip { display: flex; gap: 0; align-items: flex-start; overflow-x: auto; padding-bottom: 8px; }
+.sb-frame {
+  display: flex; flex-direction: column; align-items: center; flex-shrink: 0;
+}
+.sb-panel {
+  width: 120px; height: 90px; border: 2px solid var(--warm-border);
+  border-radius: 10px; background: var(--ivory);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.6rem; position: relative;
+}
+.sb-panel-num {
+  position: absolute; top: 6px; left: 8px;
+  font-size: 0.6rem; font-weight: 700; color: var(--muted); opacity: 0.6;
+}
+.sb-caption { width: 120px; font-size: 0.7rem; color: var(--muted); text-align: center; padding: 8px 6px; line-height: 1.45; font-weight: 300; }
+.sb-connector { display: flex; align-items: center; padding-top: 45px; flex-shrink: 0; }
+.sb-arrow { width: 24px; height: 2px; background: var(--muted); position: relative; }
+.sb-arrow::after { content: '▶'; position: absolute; right: -8px; top: -7px; font-size: 0.7rem; color: var(--muted); }
+
+/* IA / User Flow */
+.ia-section { margin-bottom: 32px; }
+.ia-section-title {
+  font-size: 0.68rem; font-weight: 700; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--terra); margin-bottom: 20px;
+}
+
+/* Lo-Fi Wireframe placeholders */
+.lofi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+@media(max-width:700px){ .lofi-grid { grid-template-columns: 1fr; } }
+.lofi-frame {
+  background: var(--card-bg); border: 1px solid var(--warm-border);
+  border-radius: 14px; overflow: hidden;
+  box-shadow: 0 2px 12px rgba(30,26,20,0.05);
+  transition: transform 0.2s;
+}
+.lofi-frame:hover { transform: translateY(-2px); }
+.lofi-screen {
+  background: #f8f6f3; height: 200px; padding: 12px;
+  border-bottom: 1px solid var(--warm-border);
+  display: flex; flex-direction: column; gap: 8px;
+}
+.lofi-bar { background: var(--parchment); border-radius: 4px; }
+.lofi-caption { padding: 14px 16px; }
+.lofi-caption-title { font-family: 'Playfair Display', serif; font-size: 0.88rem; font-weight: 700; color: var(--deep); margin-bottom: 4px; }
+.lofi-caption-desc { font-size: 0.74rem; color: var(--muted); line-height: 1.5; font-weight: 300; }
+
+/* Optional badge */
+.optional-badge {
+  display: inline-block; font-size: 0.62rem; font-weight: 700;
+  padding: 3px 10px; border-radius: 20px;
+  background: var(--parchment); color: var(--muted);
+  letter-spacing: 0.08em; text-transform: uppercase;
+  margin-left: 10px; vertical-align: middle;
+}
+
+
+/* ── Step Trail ── */
+.step-trail-wrap {
+  position: relative; z-index: 1;
+  max-width: 1100px; margin: 0 auto;
+  padding: 28px 40px 0;
+}
+.step-trail {
+  display: flex; align-items: center; gap: 0;
+  overflow-x: auto; padding-bottom: 4px;
+  scrollbar-width: none;
+}
+.step-trail::-webkit-scrollbar { display: none; }
+.step-pill {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 18px; border-radius: 12px;
+  border: 1.5px solid var(--warm-border);
+  background: white; white-space: nowrap;
+  transition: all 0.22s cubic-bezier(.4,0,.2,1);
+  cursor: pointer; flex-shrink: 0;
+  text-decoration: none;
+  box-shadow: 0 1px 4px rgba(30,26,20,0.05);
+}
+.step-pill:hover {
+  border-color: var(--terra-light);
+  background: var(--ivory);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(196,98,45,0.12);
+}
+.step-pill.active {
+  border-color: var(--terra);
+  background: linear-gradient(135deg, var(--terra) 0%, #a34d20 100%);
+  box-shadow: 0 4px 20px rgba(196,98,45,0.3);
+  transform: translateY(-1px);
+}
+.sp-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--warm-border); flex-shrink: 0;
+  transition: background 0.2s;
+}
+.step-pill.active .sp-dot { background: rgba(255,255,255,0.6); }
+.step-pill.done .sp-dot { background: var(--terra); }
+.sp-num {
+  font-family: 'Playfair Display', serif; font-size: 0.68rem;
+  font-weight: 700; color: var(--muted); line-height: 1;
+}
+.step-pill.active .sp-num { color: rgba(255,255,255,0.65); }
+.sp-label {
+  font-size: 0.74rem; font-weight: 600; color: var(--muted);
+  letter-spacing: 0.02em;
+}
+.step-pill.active .sp-label { color: white; }
+.step-line {
+  flex: 1; height: 1.5px;
+  background: linear-gradient(90deg, var(--warm-border), var(--warm-border));
+  min-width: 16px; flex-shrink: 0; position: relative;
+}
+.step-line::after {
+  content: ''; position: absolute; right: -4px; top: -3px;
+  width: 0; height: 0;
+  border-left: 5px solid var(--warm-border);
+  border-top: 3.5px solid transparent;
+  border-bottom: 3.5px solid transparent;
+}
+
+/* ── Phase Banner Colors ── */
+.phase-banner {
+  position: relative; z-index: 1;
+  overflow: hidden;
+}
+.phase-banner::before {
+  content: ''; position: absolute; inset: 0;
+  pointer-events: none;
+}
+.phase-banner-inner {
+  max-width: 1100px; margin: 0 auto; padding: 36px 40px;
+  display: flex; align-items: center; gap: 28px;
+  position: relative; z-index: 1;
+}
+.phase-num {
+  font-family: 'Playfair Display', serif; font-size: 5rem; font-weight: 900;
+  line-height: 1; flex-shrink: 0; user-select: none;
+  opacity: 0.35;
+}
+.phase-title {
+  font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 700;
+  color: white; line-height: 1; margin-bottom: 6px;
+}
+.phase-sub {
+  font-size: 0.73rem; color: rgba(255,255,255,0.5); margin-top: 0;
+  letter-spacing: 0.04em; font-weight: 400;
+}
+/* Per-phase color themes */
+#empathize {
+  background: linear-gradient(135deg, #0f4c81 0%, #1565a0 50%, #0d3d6b 100%);
+  border-left: 5px solid #60b4f0;
+  box-shadow: inset 0 0 80px rgba(96,180,240,0.08);
+}
+#empathize .phase-num  { color: #60b4f0; opacity: 1; }
+#empathize .phase-title { color: #ffffff; text-shadow: 0 2px 12px rgba(0,0,0,0.3); }
+#empathize .phase-sub  { color: rgba(200,230,255,0.65); }
+
+#define {
+  background: linear-gradient(135deg, #4a1d8a 0%, #5e2da0 50%, #3a1570 100%);
+  border-left: 5px solid #b97ef5;
+  box-shadow: inset 0 0 80px rgba(185,126,245,0.08);
+}
+#define .phase-num  { color: #b97ef5; opacity: 1; }
+#define .phase-title { color: #ffffff; text-shadow: 0 2px 12px rgba(0,0,0,0.3); }
+#define .phase-sub  { color: rgba(220,200,255,0.65); }
+
+#ideate {
+  background: linear-gradient(135deg, #166534 0%, #1a7a40 50%, #0f4d27 100%);
+  border-left: 5px solid #4ade80;
+  box-shadow: inset 0 0 80px rgba(74,222,128,0.06);
+}
+#ideate .phase-num  { color: #4ade80; opacity: 1; }
+#ideate .phase-title { color: #ffffff; text-shadow: 0 2px 12px rgba(0,0,0,0.3); }
+#ideate .phase-sub  { color: rgba(200,240,210,0.65); }
+
+#prototype {
+  background: linear-gradient(135deg, #7c2d12 0%, #9a3515 50%, #5c1f08 100%);
+  border-left: 5px solid #fb923c;
+  box-shadow: inset 0 0 80px rgba(251,146,60,0.08);
+}
+#prototype .phase-num  { color: #fb923c; opacity: 1; }
+#prototype .phase-title { color: #ffffff; text-shadow: 0 2px 12px rgba(0,0,0,0.3); }
+#prototype .phase-sub  { color: rgba(255,220,195,0.65); }
+
+/* Section number accent colors matching phase */
+.step-pill.done {
+  border-color: rgba(196,98,45,0.25);
+  background: rgba(196,98,45,0.05);
+}
+.step-pill.done .sp-num,
+.step-pill.done .sp-label { color: var(--terra); opacity: 0.7; }
+.step-pill.done .sp-dot { background: var(--terra); opacity: 0.5; }
+
+/* Section title group */
+.section-title-group { display: flex; flex-direction: column; }
+</style>
+</head>
+<body>
+<div class="bg-blob blob-1"></div>
+<div class="bg-blob blob-2"></div>
+
+<nav>
+  <div class="nav-brand">UX Portfolio</div>
+  <div class="nav-links">
+    <a href="#empathize">01 Empathize</a>
+    <a href="#define">02 Define</a>
+    <a href="#ideate">03 Ideate</a>
+    <a href="#prototype">04 Prototype</a>
+    <a href="#checklist">Checklist</a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<div class="hero fade d1">
+  <div>
+    <div class="hero-eyebrow">
+      <div class="eyebrow-line"></div>
+      <div class="eyebrow-text">UX/UI Case Study</div>
+    </div>
+    <h1>Facebook <em>Privacy</em><br>&amp; Settings<br>Redesign</h1>
+    <p class="hero-desc">A research-driven UX case study redesigning Facebook's privacy and settings experience — from pain point discovery through to a working high-fidelity prototype of the Accounts Gateway concept.</p>
+  </div>
+  <div class="hero-tags">
+    <div class="h-tag accent">Accounts Gateway</div>
+    <div class="h-tag">Mobile App</div>
+    <div class="h-tag">Research + Wireframes</div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- Step Trail -->
+<div class="step-trail-wrap">
+  <div class="step-trail">
+    <a href="#empathize" class="step-pill active" data-phase="empathize">
+      <span class="sp-dot"></span>
+      <span class="sp-num">01</span>
+      <span class="sp-label">Empathize</span>
+    </a>
+    <div class="step-line"></div>
+    <a href="#define" class="step-pill" data-phase="define">
+      <span class="sp-dot"></span>
+      <span class="sp-num">02</span>
+      <span class="sp-label">Define</span>
+    </a>
+    <div class="step-line"></div>
+    <a href="#ideate" class="step-pill" data-phase="ideate">
+      <span class="sp-dot"></span>
+      <span class="sp-num">03</span>
+      <span class="sp-label">Ideate</span>
+    </a>
+    <div class="step-line"></div>
+    <a href="#prototype" class="step-pill" data-phase="prototype">
+      <span class="sp-dot"></span>
+      <span class="sp-num">04</span>
+      <span class="sp-label">Prototype</span>
+    </a>
+    <div class="step-line"></div>
+    <a href="#checklist" class="step-pill" data-phase="checklist">
+      <span class="sp-dot"></span>
+      <span class="sp-num">05</span>
+      <span class="sp-label">Review</span>
+    </a>
+  </div>
+</div>
+
+<div class="divider" style="margin-top:32px;"></div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- 01 EMPATHIZE                                               -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="phase-banner" id="empathize">
+  <div class="phase-banner-inner">
+    <div class="phase-num">01</div>
+    <div>
+      <div class="phase-title">Empathize</div>
+      <div class="phase-sub">Pain Point Gathering · 5 Whys · Causal Loop Diagram · Empathy Map</div>
+    </div>
+  </div>
+</div>
+
+<!-- Pain Point Gathering -->
+<div class="section-wrap" id="research">
+  <div class="section-header fade d1">
+    <div class="section-num">01</div>
+    <div class="section-title-group">
+      <div class="section-kicker">Empathize · Pain Point Gathering</div>
+      <h2>What Users Actually Struggle With</h2>
+      <p class="section-desc">Five friction points captured from real app interactions — each analysed by what triggers the frustration, the emotional response it creates, and how severely it blocks the user's goal.</p>
+    </div>
+  </div>
+
+  <div class="pain-grid fade d2">
+    <div class="pain-card c1">
+      <div class="pain-card-accent"></div>
+      <div class="pain-num">Pain Point 01</div>
+      <div class="pain-title">Facebook Settings &amp; Privacy</div>
+      <p class="pain-trigger">Complex, nested settings make it hard to locate specific controls — users slow down and feel lost navigating the deep hierarchy.</p>
+      <div class="pain-footer">
+        <span class="emotion-chip">😕 Confused</span>
+        <span class="sev-chip sev-med">Medium</span>
+      </div>
+    </div>
+    <div class="pain-card c2">
+      <div class="pain-card-accent"></div>
+      <div class="pain-num">Pain Point 02</div>
+      <div class="pain-title">YouTube Skip &amp; Subscription Buttons</div>
+      <p class="pain-trigger">The skip button sits too close to ad buttons — users accidentally tap ads when in a hurry and get redirected to unwanted sites.</p>
+      <div class="pain-footer">
+        <span class="emotion-chip">😤 Frustrated</span>
+        <span class="sev-chip sev-med">Medium</span>
+      </div>
+    </div>
+    <div class="pain-card c3">
+      <div class="pain-card-accent"></div>
+      <div class="pain-num">Pain Point 03</div>
+      <div class="pain-title">Messenger Notifications</div>
+      <p class="pain-trigger">Irrelevant nudges like "Someone posted a note you might like" constantly pull attention away from what the user is actually trying to do.</p>
+      <div class="pain-footer">
+        <span class="emotion-chip">😤 Frustrated</span>
+        <span class="sev-chip sev-low">Low</span>
+      </div>
+    </div>
+    <div class="pain-card c4">
+      <div class="pain-card-accent"></div>
+      <div class="pain-num">Pain Point 04</div>
+      <div class="pain-title">Catholic Prayers UI</div>
+      <p class="pain-trigger">Overly mixed color palette creates visual confusion and poses an accessibility problem for users who are color-blind.</p>
+      <div class="pain-footer">
+        <span class="emotion-chip">😕 Confused</span>
+        <span class="sev-chip sev-med">Medium</span>
+      </div>
+    </div>
+    <div class="pain-card c5">
+      <div class="pain-card-accent"></div>
+      <div class="pain-num">Pain Point 05</div>
+      <div class="pain-title">Shopee Pop-Up Advertisements</div>
+      <p class="pain-trigger">While using the Shopee app, many unexpected advertisements pop up. Users often accidentally click them, which redirects to annoying web pages — interrupting the shopping experience.</p>
+      <div class="pain-footer">
+        <span class="emotion-chip">😠 Annoyed</span>
+        <span class="sev-chip sev-high">High</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="reflection fade d3">
+    <p class="reflection-text">From my pain points logs, the common pattern is that these apps always try to get users' attention and interaction rather than comfort and simplicity. Consequently, their revenue-focused design decisions often create frustration when using the app. Regarding my pain point about "Facebook Settings and Privacy", if I were a developer on the team, this issue likely exists because of too many options without clear hierarchy and features overloading as the app ecosystem is very large. As a result, some users get lost in the settings and feel confused even when looking for simple adjustments.</p>
+    <div class="reflection-attr">— Research Reflection</div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- 5 Whys -->
+<div class="section-wrap" id="fivewhys">
+  <div class="section-header fade d1">
+    <div class="section-num">01</div>
+    <div class="section-title-group">
+      <div class="section-kicker">Empathize · The 5 Whys</div>
+      <h2>Root Cause Analysis</h2>
+      <p class="section-desc">Using the 5 Whys method to trace the privacy complexity problem beyond its visible symptom — revealing that the root cause lies in how Facebook's product goals are structured, not just how settings are designed.</p>
+    </div>
+  </div>
+
+  <div class="whys-single fade d2">
+    <div class="why-problem-block">
+      <div class="why-problem-label">PROBLEM</div>
+      <div class="why-problem-text">Misplaced signals lead to complex problems.</div>
+    </div>
+    <div class="why-arrow-v"></div>
+    <div class="why-block">
+      <div class="why-tag">WHY 1</div>
+      <div class="why-text">Users avoid settings.</div>
+    </div>
+    <div class="why-arrow-v"></div>
+    <div class="why-block">
+      <div class="why-tag">WHY 2</div>
+      <div class="why-text">Menus are too deep.</div>
+    </div>
+    <div class="why-arrow-v"></div>
+    <div class="why-block">
+      <div class="why-tag">WHY 3</div>
+      <div class="why-text">Too many new features.</div>
+    </div>
+    <div class="why-arrow-v"></div>
+    <div class="why-block">
+      <div class="why-tag">WHY 4</div>
+      <div class="why-text">No UX review.</div>
+    </div>
+    <div class="why-arrow-v"></div>
+    <div class="why-block root-cause">
+      <div class="why-tag root">WHY 5 — ROOT CAUSE</div>
+      <div class="why-text">Goals focus on quantity. <span style="font-weight:300;font-size:0.82rem;">(Implicitly creating UX blind spots)</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- CLD -->
+<div class="section-wrap" id="cld">
+  <div class="section-header fade d1">
+    <div class="section-num">01</div>
+    <div class="section-title-group">
+      <div class="section-kicker">Empathize · Causal Loop Diagram (CLD)</div>
+      <h2>The Complexity Loop</h2>
+      <p class="section-desc">A Causal Loop Diagram mapping the self-reinforcing system behind Facebook's privacy problem. Each new feature expands settings volume, which increases complexity, which drives user avoidance — and because users stop engaging with settings, the team receives no usability feedback, which justifies shipping even more features. The loop feeds itself.</p>
+    </div>
+  </div>
+  <div class="cld-svg-wrap fade d2">
+    <svg viewBox="0 0 760 870" xmlns="http://www.w3.org/2000/svg" class="cld-svg" style="display:block;">
+      <defs>
+        <marker id="arr" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+          <polygon points="0 0, 10 4, 0 8" fill="#5a4a3a"/>
+        </marker>
+        <marker id="arr-dash" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+          <polygon points="0 0, 10 4, 0 8" fill="#5a4a3a"/>
+        </marker>
+      </defs>
+
+      <!-- ══════════════════════════════════════════
+           MAIN VERTICAL CHAIN  (centre column)
+           ══════════════════════════════════════════ -->
+
+      <!-- NODE 1: Feature & Policy Expansion -->
+      <rect x="220" y="30" width="280" height="60" rx="10" fill="white" stroke="#3d2f1f" stroke-width="2"/>
+      <text x="360" y="56" text-anchor="middle" font-family="Instrument Sans,sans-serif" font-size="13.5" font-weight="700" fill="#1e1a14">Feature &amp; Policy Expansion</text>
+      <text x="360" y="74" text-anchor="middle" font-family="Instrument Sans,sans-serif" font-size="11" fill="#8a7968">(New features, settings)</text>
+
+      <!-- ↓ S -->
+      <line x1="360" y1="90" x2="360" y2="148" stroke="#5a4a3a" stroke-width="2" marker-end="url(#arr)"/>
+      <rect x="347" y="108" width="22" height="20" rx="5" fill="#fdf9f4" stroke="#d6c9b8" stroke-width="1"/>
+      <text x="358" y="122" text-anchor="middle" font-family="Instrument Sans,sans-serif" font-size="12" font-weight="800" fill="#c4622d">S</text>
+
+      <!-- NODE 2: Number of Settings & Options -->
+      <rect x="220" y="148" width="280" height="60" rx="10" fill="white" stroke="#3d2f1f" stroke-width="2"/>
+      <text x="360" y="174" text-anchor="middle" font-family="Instrument Sans,sans-serif" font-size="13.5" font-weight="700" fill="#1e1a14">Number of Settings &amp; Options</text>
+      <text x="360" y="192" text-anchor="middle" font-family="Instrument Sans,sans-serif" font-size="11" fill="#8a7968">(Volume of choices)</text>
+
+      <!-- ↓ S -->
+      <line x1="360" y1="208" x2="360" y2="266" stroke="#5a4a3a" stroke-width="2" marker-end="url(#arr)"/>
+      <rect x="347" y="226" width="22" height="20" rx="5" fill="#fdf9f4" stroke="#d6c9b8" stroke-width="1"/>
+      <text x="358" y="240" text-anchor="middle" font-family="Instrument Sans,sans-serif" font-size="12" font-weight="800" fill="#c4622d">S</text>
+
+      <!-- NODE 3: Settings Complexity -->
+      <rect x="220" y="266" width="280" height="60" rx="10" fill="white" stroke="#3d2f1f" stroke-width="2"/>
+      <text x="360" y="292" text-anchor="middle" font-family="Instrument Sans,sans-serif" font-size="13.5" font-weight="700" fill="#1e1a14">Settings Complexity</text>
+      <text x="360" y="310" text-anchor="middle" font-family="Instrument Sans,sans-serif" font-size="11" fill="#8a7968">(Deep and nested menus)</text>
+
+      <!-- ↓ S -->
+      <line x1="360" y1="326" x2="360" y2="384" stroke="#5a4a3a" stroke-width="2" marker-end="url(#arr)"/>
+      <rect x="347" y="344" width="22" height="20" rx="5" fill="#fdf9f4" stroke="#d6c9b8" stroke-width="1"/>
+      <text x="358" y="358" text-anchor="middle" font-family="Instrument Sans,sans-serif" font-size="12" font-weight="800" fill="#c4622d">S</text>
+
+      <!-- NODE 4: User Confusion -->
+      <rect x="220" y="384" width="280" height="60" rx="10" fill="white" stroke="#3d2f1f" stroke-width="2"/>
+      <text x="360" y="410" text-anchor="middle" font-family="Instrument Sans,sans-serif" font-size="13.5" font-weight="700" fill="#1e1a14">User Confusion</text>
+      <text x="360" y="428" text-anchor="middle" font-family="Instrument Sans,sans-serif" font-size="11" fill="#8a7968">(Hard to find controls)</text>
+
+      <!-- ↓ S -->
+      <line x1="360" y1="444" x2="360" y2="502" stroke="#5a4a3a" stroke-width="2" marker-end="url(#arr)"/>
+      <rect x="347" y="462" width="22" height="20" rx="5" fill="#fdf9f4" stroke="#d6c9b8" stroke-width="1"/>
+      <text x="358" y="476" text-anchor="middle" font-family="Instrument Sans,sans-serif" font-size="12" font-weight="800" fill="#c4622d">S</text>
+
+      <!-- NODE 5: User Avoids Settings -->
+      <rect x="220" y="502" width="280" height="60" rx="10" fill="white" stroke="#3d2f1f" stroke-width="2"/>
+      <text x="360" y="528" text-anchor="middle" font-family="Instrument Sans,sans-serif" font-size="13.5" font-weight="700" fill="#1e1a14">User Avoids Settings</text>
+      <text x="360" y="546" text-anchor="middle" font-family="Instrument Sans,sans-serif" font-size="11" fill="#8a7968">(Stops exploring options)</text>
+
+      <!-- ↓ S -->
+      <line x1="360" y1="562" x2="360" y2="616" stroke="#5a4a3a" stroke-width="2" marker-end="url(#arr)"/>
+      <rect x="347" y="580" width="22" height="20" rx="5" fill="#fdf9f4" stroke="#d6c9b8" stroke-width="1"/>
+      <text x="358" y="594" text-anchor="middle" font-family="Instrument Sans,sans-serif" font-size="12" font-weight="800" fill="#c4622d">S</text>
+
+      <!-- OVAL: Complexity Loop -->
+      <ellipse cx="360" cy="648" rx="120" ry="40" fill="#c4622d"/>
+      <text x="360" y="644" text-anchor="middle" font-family="Instrument Sans,sans-serif" font-size="15" font-weight="800" fill="white">Complexity Loop</text>
+      <text x="360" y="663" text-anchor="middle" font-family="Instrument Sans,sans-serif" font-size="10.5" fill="rgba(255,255,255,0.85)">Reinforcing cycle (R)</text>
+
+      <!-- ↓ O -->
+      <line x1="360" y1="688" x2="360" y2="742" stroke="#5a4a3a" stroke-width="2" marker-end="url(#arr)"/>
+      <rect x="347" y="706" width="22" height="20" rx="5" fill="#fdf9f4" stroke="#d6c9b8" stroke-width="1"/>
+      <text x="358" y="720" text-anchor="middle" font-family="Instrument Sans,sans-serif" font-size="12" font-weight="800" fill="#c4622d">O</text>
+
+      <!-- NODE 7: Usability Feedback Quality -->
+      <rect x="170" y="742" width="380" height="60" rx="10" fill="white" stroke="#3d2f1f" stroke-width="2"/>
+      <text x="360" y="768" text-anchor="middle" font-family="Instrument Sans,sans-serif" font-size="13.5" font-weight="700" fill="#1e1a14">Usability Feedback Quality</text>
+      <text x="360" y="786" text-anchor="middle" font-family="Instrument Sans,sans-serif" font-size="11" fill="#8a7968">(Meaningful UX signals)</text>
+
+      <!-- ══════════════════════════════════════════
+           RIGHT FEEDBACK LOOP
+           Usability Feedback → Feature Expansion
+           Large curve up the right side  (O)
+           ══════════════════════════════════════════ -->
+      <path d="M 550 772  C 700 772  700 60  500 60"
+            stroke="#5a4a3a" stroke-width="2" fill="none"
+            stroke-dasharray="7,5"
+            marker-end="url(#arr-dash)"/>
+      <!-- O label on right side -->
+      <rect x="672" y="408" width="22" height="20" rx="5" fill="#fdf9f4" stroke="#d6c9b8" stroke-width="1"/>
+      <text x="683" y="422" text-anchor="middle" font-family="Instrument Sans,sans-serif" font-size="12" font-weight="800" fill="#c4622d">O</text>
+
+      <!-- ══════════════════════════════════════════
+           LEFT BRANCH: UX Simplification
+           ══════════════════════════════════════════ -->
+
+      <!-- NODE: UX Simplification -->
+      <rect x="20" y="618" width="168" height="60" rx="10" fill="white" stroke="#3d2f1f" stroke-width="2"/>
+      <text x="104" y="644" text-anchor="middle" font-family="Instrument Sans,sans-serif" font-size="12.5" font-weight="700" fill="#1e1a14">UX Simplification</text>
+      <text x="104" y="662" text-anchor="middle" font-family="Instrument Sans,sans-serif" font-size="11" fill="#8a7968">(Clear hierarchy)</text>
+
+      <!-- Arrow: User Avoids Settings → UX Simplification  (S)
+           Comes off left side of node 5, curves down to left node -->
+      <path d="M 220 532  C 104 532  104 618  104 618"
+            stroke="#5a4a3a" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+      <rect x="91" y="548" width="22" height="20" rx="5" fill="#fdf9f4" stroke="#d6c9b8" stroke-width="1"/>
+      <text x="102" y="562" text-anchor="middle" font-family="Instrument Sans,sans-serif" font-size="12" font-weight="800" fill="#c4622d">S</text>
+
+      <!-- Arrow: UX Simplification → Complexity Loop  (O)
+           Right side of left node → left edge of oval -->
+      <path d="M 188 648  C 214 648  228 648  240 648"
+            stroke="#5a4a3a" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+      <rect x="194" y="638" width="22" height="20" rx="5" fill="#fdf9f4" stroke="#d6c9b8" stroke-width="1"/>
+      <text x="205" y="652" text-anchor="middle" font-family="Instrument Sans,sans-serif" font-size="12" font-weight="800" fill="#c4622d">O</text>
+
+      <!-- Arrow: UX Simplification → Usability Feedback  (O)
+           Bottom of left node curves down to left edge of node 7 -->
+      <path d="M 104 678  C 104 772  170 772  170 772"
+            stroke="#5a4a3a" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+      <rect x="91" y="714" width="22" height="20" rx="5" fill="#fdf9f4" stroke="#d6c9b8" stroke-width="1"/>
+      <text x="102" y="728" text-anchor="middle" font-family="Instrument Sans,sans-serif" font-size="12" font-weight="800" fill="#c4622d">O</text>
+
+    </svg>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- Empathy Map -->
+<div class="section-wrap" id="persona">
+  <div class="section-header fade d1">
+    <div class="section-num">01</div>
+    <div class="section-title-group">
+      <div class="section-kicker">Empathize · Empathy Map</div>
+      <h2>Understanding Sarah Mitchell</h2>
+      <p class="section-desc">An empathy map capturing what Sarah says, thinks, does, and feels when trying to manage her privacy on Facebook — built directly from the pain points and CLD research to keep design decisions grounded in her reality.</p>
+    </div>
+  </div>
+  <div class="empathy-grid fade d2" style="max-width:860px;">
+    <div class="empathy-quadrant" data-icon="💬">
+      <div class="eq-label says"><span class="eq-icon">💬</span> Says</div>
+      <div class="eq-item">"I can't find where to change this privacy setting."</div>
+      <div class="eq-item">"Why do they keep adding more features that complicate everything?"</div>
+    </div>
+    <div class="empathy-quadrant" data-icon="💭">
+      <div class="eq-label thinks"><span class="eq-icon">💭</span> Thinks</div>
+      <div class="eq-item">"If I don't configure these settings properly, my data might be exposed."</div>
+      <div class="eq-item">"There are too many nested menus — I'll never find what I need."</div>
+    </div>
+    <div class="empathy-quadrant" data-icon="🖐️">
+      <div class="eq-label does"><span class="eq-icon">🖐️</span> Does</div>
+      <div class="eq-item">Opens settings menu, gets confused, then closes it.</div>
+      <div class="eq-item">Accepts default privacy settings without customization.</div>
+    </div>
+    <div class="empathy-quadrant" data-icon="❤️">
+      <div class="eq-label feels"><span class="eq-icon">❤️</span> Feels</div>
+      <div class="feels-chips">
+        <span class="feels-chip overwhelmed">Overwhelmed</span>
+        <span class="feels-chip confused">Confused</span>
+        <span class="feels-chip frustrated">Frustrated</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- 02 DEFINE                                                  -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="phase-banner" id="define">
+  <div class="phase-banner-inner">
+    <div class="phase-num">02</div>
+    <div>
+      <div class="phase-title">Define</div>
+      <div class="phase-sub">Persona Creation · Point of View Statement · How Might We Questions · User Stories</div>
+    </div>
+  </div>
+</div>
+
+<!-- Persona Creation -->
+<div class="section-wrap" id="persona-creation">
+  <div class="section-header fade d1">
+    <div class="section-num">02</div>
+    <div class="section-title-group">
+      <div class="section-kicker">Define · Persona Creation</div>
+      <h2>Sarah Mitchell — User Persona</h2>
+      <p class="section-desc">Sarah represents the majority of Facebook's intermediate users — people who care about their privacy but are systematically blocked from acting on that care by a settings experience that was never designed with them in mind.</p>
+    </div>
+  </div>
+  <div class="persona-full fade d2">
+    <div class="persona-full-header">
+      <div class="persona-avatar-large">💄</div>
+      <div>
+        <div class="pf-name">Sarah Mitchell</div>
+        <div class="pf-role">Make-up Artist · 28 years old · Intermediate Tech User</div>
+        <div class="pf-char">Cares about privacy but overwhelmed by complexity. Avoids deep menu navigation.</div>
+      </div>
+    </div>
+    <div class="persona-full-body">
+      <div class="pf-col">
+        <div class="pf-col-title goals">🎯 Goals</div>
+        <ul class="pf-list">
+          <li>Control personal data and privacy settings effectively</li>
+          <li>Find privacy controls quickly without extensive searching</li>
+          <li>Understand new features without feeling overwhelmed</li>
+        </ul>
+      </div>
+      <div class="pf-col">
+        <div class="pf-col-title frustrations">⚡ Frustrations</div>
+        <ul class="pf-list">
+          <li>Cannot locate specific privacy settings in nested menus</li>
+          <li>Too many options lead to decision fatigue and avoidance</li>
+          <li>Default settings may compromise privacy without her knowledge</li>
+          <li>Constant feature additions make settings harder to manage</li>
+        </ul>
+      </div>
+      <div class="pf-col">
+        <div class="pf-col-title behaviors">🔄 Behaviors</div>
+        <ul class="pf-list">
+          <li>Opens settings menu, gets confused, then closes it</li>
+          <li>Accepts default privacy settings without customization</li>
+          <li>Relies on word-of-mouth to learn new features</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- POV Statement -->
+<div class="section-wrap" id="pov">
+  <div class="section-header fade d1">
+    <div class="section-num">02</div>
+    <div class="section-title-group">
+      <div class="section-kicker">Define · Point of View (POV) Statement</div>
+      <h2>Framing the Problem</h2>
+      <p class="section-desc">A Point of View statement synthesises the research into a single, actionable problem definition — keeping every subsequent design decision focused on the right user, need, and insight.</p>
+    </div>
+  </div>
+  <div class="pov-card fade d2">
+    <div class="pov-row">
+      <div class="pov-block">
+        <div class="pov-label user-label">USER</div>
+        <div class="pov-text">Sarah Mitchell — an intermediate tech user who cares about her privacy but feels overwhelmed by complex, nested settings</div>
+      </div>
+      <div class="pov-plus">+</div>
+      <div class="pov-block">
+        <div class="pov-label need-label">NEED</div>
+        <div class="pov-text">A clear, accessible way to find and control her privacy settings quickly, without feeling confused or lost</div>
+      </div>
+      <div class="pov-plus">+</div>
+      <div class="pov-block">
+        <div class="pov-label insight-label">INSIGHT</div>
+        <div class="pov-text">Facebook's continuous feature expansion creates increasingly complex menus, causing users to avoid settings altogether and unknowingly compromise their own privacy</div>
+      </div>
+    </div>
+    <div class="pov-statement">
+      <div class="pov-statement-label">POV STATEMENT</div>
+      <div class="pov-statement-text">"Sarah Mitchell needs a simplified, transparent privacy settings experience — because Facebook's continuous feature expansion creates deeply nested menus that overwhelm her, causing her to abandon settings navigation and leave her personal data exposed by default."</div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- How Might We -->
+<div class="section-wrap" id="validation">
+  <div class="section-header fade d1">
+    <div class="section-num">02</div>
+    <div class="section-title-group">
+      <div class="section-kicker">Define · How Might We (HMW) Questions</div>
+      <h2>Turning Problems into Opportunities</h2>
+      <p class="section-desc">How Might We questions reframe each pain point as an open-ended design challenge — shifting the focus from what is broken to what could be built.</p>
+    </div>
+  </div>
+  <div class="hmw-grid fade d2">
+    <div class="hmw-card-new">
+      <div class="hmw-card-num">HMW 01</div>
+      <div class="hmw-card-q">How might we give users a single, flat view of all their privacy controls — so that finding and adjusting settings never requires navigating nested menus?</div>
+      <div class="hmw-card-from">← From: Settings complexity &amp; deep menu navigation</div>
+    </div>
+    <div class="hmw-card-new">
+      <div class="hmw-card-num">HMW 02</div>
+      <div class="hmw-card-q">How might we show users the current state of their privacy at a glance — so they always know what is exposed without having to actively search for it?</div>
+      <div class="hmw-card-from">← From: Default settings silently compromising privacy</div>
+    </div>
+    <div class="hmw-card-new">
+      <div class="hmw-card-num">HMW 03</div>
+      <div class="hmw-card-q">How might we let users find any privacy setting in seconds using natural language — so that not knowing where a control lives never blocks them from using it?</div>
+      <div class="hmw-card-from">← From: User confusion &amp; avoidance of settings</div>
+    </div>
+    <div class="hmw-card-new">
+      <div class="hmw-card-num">HMW 04</div>
+      <div class="hmw-card-q">How might we introduce new features in a way that keeps the settings experience simple — so that the product can grow without making privacy harder to control?</div>
+      <div class="hmw-card-from">← From: Feature expansion reinforcing the complexity loop</div>
+    </div>
+  </div>
+  <div style="margin-top:24px;" class="fade d3">
+    <div class="val-grid">
+      <div class="val-card">
+        <div class="val-icon o">🔍</div>
+        <h3>What the Research Revealed</h3>
+        <ul class="val-list">
+          <li>Settings are <strong>5+ levels deep</strong> — users abandon navigation before finding what they need</li>
+          <li>No visual privacy status — users have <strong>no idea what is currently exposed</strong> without digging</li>
+          <li>Every new feature <strong>adds a new settings entry</strong> with no consolidation or cleanup</li>
+          <li>Users who give up on settings <strong>leave defaults unchanged</strong>, unknowingly sharing more data</li>
+        </ul>
+      </div>
+      <div class="val-card">
+        <div class="val-icon a">✅</div>
+        <h3>How the Design Responds</h3>
+        <ul class="val-list">
+          <li><strong>Accounts Gateway</strong> — one flat hub, all controls visible in a single scroll</li>
+          <li><strong>Traffic-light status badges</strong> show live privacy state on every setting row</li>
+          <li><strong>Smart Search (⌘K)</strong> — find any setting by typing plain English, no navigation needed</li>
+          <li><strong>Plain-language labels</strong> replace jargon so users understand what each toggle actually does</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- User Stories -->
+<div class="section-wrap" id="userstories">
+  <div class="section-header fade d1">
+    <div class="section-num">02</div>
+    <div class="section-title-group">
+      <div class="section-kicker">Define · User Stories</div>
+      <h2>What Sarah Needs to Do</h2>
+      <p class="section-desc">User stories translate HMW questions into concrete feature requirements — each anchored to a real user need, with acceptance criteria that make the definition of done clear and testable.</p>
+    </div>
+  </div>
+  <div class="stories-grid fade d2">
+    <div class="story-card">
+      <div class="story-priority must">Must Have</div>
+      <div class="story-text">As <strong>a Facebook user</strong>, I want to <strong>access all my privacy settings from one screen</strong>, so that <strong>I never have to dig through nested menus to find a basic control</strong>.</div>
+      <div class="story-acceptance">
+        <div class="story-ac-label">Acceptance Criteria</div>
+        <div class="story-ac-item">✓ Privacy hub reachable within 2 taps from the home screen</div>
+        <div class="story-ac-item">✓ All top-level privacy categories visible without scrolling</div>
+      </div>
+    </div>
+    <div class="story-card">
+      <div class="story-priority must">Must Have</div>
+      <div class="story-text">As <strong>Sarah</strong>, I want to <strong>see a live status indicator on every privacy setting</strong>, so that <strong>I can tell at a glance whether my data is protected or exposed — without changing anything</strong>.</div>
+      <div class="story-acceptance">
+        <div class="story-ac-label">Acceptance Criteria</div>
+        <div class="story-ac-item">✓ Every setting row shows a colour-coded status badge (🟢 Private / 🔴 Public / 🟡 Mixed)</div>
+        <div class="story-ac-item">✓ Status updates immediately when a toggle is changed</div>
+      </div>
+    </div>
+    <div class="story-card">
+      <div class="story-priority should">Should Have</div>
+      <div class="story-text">As <strong>an intermediate tech user</strong>, I want to <strong>type a plain-English phrase to find any setting</strong>, so that <strong>I can locate what I need even when I don't know where it lives in the menu structure</strong>.</div>
+      <div class="story-acceptance">
+        <div class="story-ac-label">Acceptance Criteria</div>
+        <div class="story-ac-item">✓ Search bar (⌘K) accessible from every screen in the gateway</div>
+        <div class="story-ac-item">✓ Results display setting name, category, and current status</div>
+      </div>
+    </div>
+    <div class="story-card">
+      <div class="story-priority could">Could Have</div>
+      <div class="story-text">As <strong>a user who doesn't understand technical privacy terms</strong>, I want <strong>each setting to include a one-sentence plain-language explanation</strong>, so that <strong>I can make an informed choice without having to search for what the setting actually does</strong>.</div>
+      <div class="story-acceptance">
+        <div class="story-ac-label">Acceptance Criteria</div>
+        <div class="story-ac-item">✓ Info tooltip visible on tap for every privacy control</div>
+        <div class="story-ac-item">✓ Explanation is under 25 words and jargon-free</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- 03 IDEATE                                                  -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="phase-banner" id="ideate">
+  <div class="phase-banner-inner">
+    <div class="phase-num">03</div>
+    <div>
+      <div class="phase-title">Ideate</div>
+      <div class="phase-sub">Crazy 8s · Selection &amp; Storyboard</div>
+    </div>
+  </div>
+</div>
+
+<!-- Crazy 8s -->
+<div class="section-wrap" id="crazy8s">
+  <div class="section-header fade d1">
+    <div class="section-num">03</div>
+    <div class="section-title-group">
+      <div class="section-kicker">Ideate · Crazy 8s</div>
+      <h2>8 Ideas in 8 Minutes</h2>
+      <p class="section-desc">A timed Crazy 8s sprint — generating eight distinct design directions without filtering or judging, then evaluating which best addresses the root causes identified in research.</p>
+    </div>
+  </div>
+
+  <div class="crazy8-grid fade d2">
+    <div class="crazy8-card crazy8-selected">
+      <div class="crazy8-sketch">🏠</div>
+      <div class="crazy8-body">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+          <div class="crazy8-num" style="margin-bottom:0;">Idea 01</div>
+          <span class="crazy8-badge">✓ Selected</span>
+        </div>
+        <div class="crazy8-title">Privacy Hub Dashboard</div>
+        <div class="crazy8-desc">One top-level screen showing all privacy controls at a glance — no nested menus required.</div>
+      </div>
+    </div>
+    <div class="crazy8-card crazy8-selected">
+      <div class="crazy8-sketch">🔍</div>
+      <div class="crazy8-body">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+          <div class="crazy8-num" style="margin-bottom:0;">Idea 02</div>
+          <span class="crazy8-badge">✓ Selected</span>
+        </div>
+        <div class="crazy8-title">Smart Search Bar</div>
+        <div class="crazy8-desc">Global search so users can type "who sees my posts?" and jump directly to the right setting.</div>
+      </div>
+    </div>
+    <div class="crazy8-card crazy8-selected">
+      <div class="crazy8-sketch">🚦</div>
+      <div class="crazy8-body">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+          <div class="crazy8-num" style="margin-bottom:0;">Idea 03</div>
+          <span class="crazy8-badge">✓ Selected</span>
+        </div>
+        <div class="crazy8-title">Privacy Traffic Light</div>
+        <div class="crazy8-desc">Green / yellow / red status indicators on each setting so users instantly see what's exposed.</div>
+      </div>
+    </div>
+    <div class="crazy8-card">
+      <div class="crazy8-sketch">🧙</div>
+      <div class="crazy8-body">
+        <div class="crazy8-num">Idea 04</div>
+        <div class="crazy8-title">Guided Setup Wizard</div>
+        <div class="crazy8-desc">A first-time walkthrough that lets users set their privacy preferences in three simple questions.</div>
+      </div>
+    </div>
+    <div class="crazy8-card">
+      <div class="crazy8-sketch">🃏</div>
+      <div class="crazy8-body">
+        <div class="crazy8-num">Idea 05</div>
+        <div class="crazy8-title">Settings Cards</div>
+        <div class="crazy8-desc">Each privacy setting as a swipeable card — tap to expand details, swipe to dismiss low-priority ones.</div>
+      </div>
+    </div>
+    <div class="crazy8-card">
+      <div class="crazy8-sketch">🔔</div>
+      <div class="crazy8-body">
+        <div class="crazy8-num">Idea 06</div>
+        <div class="crazy8-title">Privacy Change Alerts</div>
+        <div class="crazy8-desc">Proactive notification whenever a new feature silently changes a privacy default — with one-tap revert.</div>
+      </div>
+    </div>
+    <div class="crazy8-card">
+      <div class="crazy8-sketch">👤</div>
+      <div class="crazy8-body">
+        <div class="crazy8-num">Idea 07</div>
+        <div class="crazy8-title">Audience Previewer</div>
+        <div class="crazy8-desc">Show who can see each piece of content before posting — live preview right in the composer.</div>
+      </div>
+    </div>
+    <div class="crazy8-card">
+      <div class="crazy8-sketch">📋</div>
+      <div class="crazy8-body">
+        <div class="crazy8-num">Idea 08</div>
+        <div class="crazy8-title">Grouped Category Tabs</div>
+        <div class="crazy8-desc">Flatten settings into broad category tabs (Privacy · Security · Notifications · Data) for faster scanning.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="reflection fade d3">
+    <p class="reflection-text">Three ideas from the sprint rose above the rest: the Privacy Hub Dashboard (Idea 01), Smart Search (Idea 02), and Privacy Traffic Light (Idea 03). These three directly address the root causes — flat hierarchy breaks the complexity loop, search removes the need to know where things live, and status indicators make the invisible visible. They were combined into the Accounts Gateway concept for prototyping.</p>
+    <div class="reflection-attr">— Ideation Reflection</div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- Selection & Storyboard (optional) -->
+<div class="section-wrap" id="storyboard">
+  <div class="section-header fade d1">
+    <div class="section-num">03</div>
+    <div class="section-title-group">
+      <div class="section-kicker">Ideate · Selection &amp; Storyboard <span class="optional-badge">Optional</span></div>
+      <h2>The Selected Concept in Context</h2>
+      <p class="section-desc">A five-frame storyboard showing the Accounts Gateway concept in Sarah's real-world context — from the frustration that motivates the need, through the key interactions, to the moment of resolution.</p>
+    </div>
+  </div>
+
+  <div class="storyboard-wrap fade d2">
+    <div class="storyboard-strip">
+      <div class="sb-frame">
+        <div class="sb-panel"><div class="sb-panel-num">1</div>😤</div>
+        <div class="sb-caption">Sarah tries to change a privacy setting — gets lost in nested menus and gives up.</div>
+      </div>
+      <div class="sb-connector"><div class="sb-arrow"></div></div>
+      <div class="sb-frame">
+        <div class="sb-panel"><div class="sb-panel-num">2</div>📱</div>
+        <div class="sb-caption">She opens the new Accounts Gateway — one screen, all privacy controls visible.</div>
+      </div>
+      <div class="sb-connector"><div class="sb-arrow"></div></div>
+      <div class="sb-frame">
+        <div class="sb-panel"><div class="sb-panel-num">3</div>🔍</div>
+        <div class="sb-caption">She types "who sees my photos" in the search bar and lands on the right setting instantly.</div>
+      </div>
+      <div class="sb-connector"><div class="sb-arrow"></div></div>
+      <div class="sb-frame">
+        <div class="sb-panel"><div class="sb-panel-num">4</div>🚦</div>
+        <div class="sb-caption">Traffic-light status icons show her which settings are exposed — she adjusts with one tap.</div>
+      </div>
+      <div class="sb-connector"><div class="sb-arrow"></div></div>
+      <div class="sb-frame">
+        <div class="sb-panel"><div class="sb-panel-num">5</div>✅</div>
+        <div class="sb-caption">Sarah saves. She feels in control of her privacy for the first time.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- 04 PROTOTYPE                                               -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="phase-banner" id="prototype">
+  <div class="phase-banner-inner">
+    <div class="phase-num">04</div>
+    <div>
+      <div class="phase-title">Prototype</div>
+      <div class="phase-sub">Information Architecture (IA) &amp; User Flow · Low-Fidelity Wireframes · High-Fidelity Prototypes</div>
+    </div>
+  </div>
+</div>
+
+<!-- IA & User Flow -->
+<div class="section-wrap" id="ia">
+  <div class="section-header fade d1">
+    <div class="section-num">04</div>
+    <div class="section-title-group">
+      <div class="section-kicker">Prototype · Information Architecture &amp; User Flow</div>
+      <h2>Structure &amp; Navigation</h2>
+      <p class="section-desc">The information architecture flattens Facebook's notoriously nested settings into four clear top-level categories. The user flow maps the ideal path from opening the app to successfully adjusting a privacy control — in four taps or fewer.</p>
+    </div>
+  </div>
+
+  <!-- IA Sitemap -->
+  <div class="val-card fade d2" style="margin-bottom:20px;">
+    <div class="val-icon o" style="margin-bottom:14px;">🗺️</div>
+    <h3 style="margin-bottom:24px;">Information Architecture — Sitemap</h3>
+    <div class="sitemap-wrap" style="padding:24px 16px;">
+      <div class="sitemap">
+        <div class="sm-node root">Accounts Gateway</div>
+        <div class="sm-line-v"></div>
+        <div style="display:flex;width:100%;max-width:760px;position:relative;justify-content:space-between;align-items:flex-start;">
+          <div style="position:absolute;top:0;left:8%;right:8%;height:2px;background:var(--warm-border);"></div>
+          <div style="display:flex;flex-direction:column;align-items:center;width:25%;">
+            <div class="sm-line-v"></div>
+            <div class="sm-node">🔒 Privacy</div>
+            <div class="sm-line-v"></div>
+            <div style="display:flex;flex-direction:column;gap:6px;align-items:center;">
+              <div class="sm-node sub">Who sees posts</div>
+              <div class="sm-node sub">Profile visibility</div>
+              <div class="sm-node sub">Tag controls</div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;width:25%;">
+            <div class="sm-line-v"></div>
+            <div class="sm-node">🛡️ Security</div>
+            <div class="sm-line-v"></div>
+            <div style="display:flex;flex-direction:column;gap:6px;align-items:center;">
+              <div class="sm-node sub">Login alerts</div>
+              <div class="sm-node sub">Two-factor auth</div>
+              <div class="sm-node sub">Active sessions</div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;width:25%;">
+            <div class="sm-line-v"></div>
+            <div class="sm-node">🔔 Notifications</div>
+            <div class="sm-line-v"></div>
+            <div style="display:flex;flex-direction:column;gap:6px;align-items:center;">
+              <div class="sm-node sub">Push alerts</div>
+              <div class="sm-node sub">Email digests</div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;width:25%;">
+            <div class="sm-line-v"></div>
+            <div class="sm-node">📊 Data &amp; Ads</div>
+            <div class="sm-line-v"></div>
+            <div style="display:flex;flex-direction:column;gap:6px;align-items:center;">
+              <div class="sm-node sub">Ad preferences</div>
+              <div class="sm-node sub">Off-FB activity</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Happy Path Flow -->
+  <div class="val-card fade d3">
+    <div class="val-icon a" style="margin-bottom:14px;">🔄</div>
+    <h3 style="margin-bottom:28px;">User Flow — Happy Path</h3>
+
+    <div class="flow-svg-wrap">
+      <svg viewBox="0 0 640 900" xmlns="http://www.w3.org/2000/svg" class="flow-svg">
+        <defs>
+          <marker id="farr" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto">
+            <polygon points="0 0, 9 3.5, 0 7" fill="#3d4a5c"/>
+          </marker>
+          <marker id="farr-g" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto">
+            <polygon points="0 0, 9 3.5, 0 7" fill="#166534"/>
+          </marker>
+          <marker id="farr-r" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto">
+            <polygon points="0 0, 9 3.5, 0 7" fill="#991b1b"/>
+          </marker>
+        </defs>
+
+        <!-- ── START (rounded pill) ── -->
+        <rect x="245" y="16" width="150" height="40" rx="20" fill="white" stroke="#3d4a5c" stroke-width="2"/>
+        <text x="320" y="41" text-anchor="middle" font-family="Instrument Sans,sans-serif" font-size="14" font-weight="700" fill="#1e1a14">Start</text>
+
+        <!-- ↓ -->
+        <line x1="320" y1="56" x2="320" y2="90" stroke="#3d4a5c" stroke-width="2" marker-end="url(#farr)"/>
+
+        <!-- ── User Logs In ── -->
+        <rect x="215" y="90" width="210" height="44" rx="7" fill="white" stroke="#3d4a5c" stroke-width="2"/>
+        <text x="320" y="117" text-anchor="middle" font-family="Instrument Sans,sans-serif" font-size="13" font-weight="600" fill="#1e1a14">User Logs In</text>
+
+        <!-- ↓ -->
+        <line x1="320" y1="134" x2="320" y2="168" stroke="#3d4a5c" stroke-width="2" marker-end="url(#farr)"/>
+
+        <!-- ── Valid Credentials? (diamond) ── -->
+        <polygon points="320,168 390,218 320,268 250,218" fill="white" stroke="#3d4a5c" stroke-width="2"/>
+        <text x="320" y="212" text-anchor="middle" font-family="Instrument Sans,sans-serif" font-size="11" font-weight="700" fill="#1e1a14">Valid</text>
+        <text x="320" y="228" text-anchor="middle" font-family="Instrument Sans,sans-serif" font-size="11" font-weight="700" fill="#1e1a14">Credentials?</text>
+
+        <!-- Yes label + arrow down-left to Access Dashboard -->
+        <text x="218" y="260" text-anchor="middle" font-family="Instrument Sans,sans-serif" font-size="11" font-weight="800" fill="#166534">Yes</text>
+        <line x1="250" y1="218" x2="170" y2="218" stroke="#3d4a5c" stroke-width="2" marker-end="url(#farr)"/>
+        <!-- down from 170,218 -->
+        <line x1="170" y1="218" x2="170" y2="292" stroke="#3d4a5c" stroke-width="2" marker-end="url(#farr)"/>
+
+        <!-- No label + arrow right to Show Error & Retry -->
+        <text x="430" y="212" text-anchor="middle" font-family="Instrument Sans,sans-serif" font-size="11" font-weight="800" fill="#991b1b">No</text>
+        <line x1="390" y1="218" x2="480" y2="218" stroke="#3d4a5c" stroke-width="2" marker-end="url(#farr)"/>
+        <!-- Show Error & Retry box -->
+        <rect x="480" y="196" width="148" height="44" rx="7" fill="#dc2626" stroke="#991b1b" stroke-width="2"/>
+        <text x="554" y="218" text-anchor="middle" font-family="Instrument Sans,sans-serif" font-size="11.5" font-weight="700" fill="white">Show Error</text>
+        <text x="554" y="232" text-anchor="middle" font-family="Instrument Sans,sans-serif" font-size="11.5" font-weight="700" fill="white">&amp; Retry</text>
+
+        <!-- ── Access Dashboard (green) ── -->
+        <rect x="75" y="292" width="190" height="44" rx="7" fill="#16a34a" stroke="#166534" stroke-width="2"/>
+        <text x="170" y="319" text-anchor="middle" font-family="Instrument Sans,sans-serif" font-size="13" font-weight="700" fill="white">Access Dashboard</text>
+
+        <!-- ↓ from Access Dashboard, re-join main line at x=320 -->
+        <line x1="170" y1="336" x2="170" y2="376" stroke="#3d4a5c" stroke-width="2"/>
+        <line x1="170" y1="376" x2="305" y2="376" stroke="#3d4a5c" stroke-width="2" marker-end="url(#farr)"/>
+
+        <!-- ── Navigate to Settings ── -->
+        <rect x="215" y="376" width="210" height="44" rx="7" fill="white" stroke="#3d4a5c" stroke-width="2"/>
+        <text x="320" y="403" text-anchor="middle" font-family="Instrument Sans,sans-serif" font-size="13" font-weight="600" fill="#1e1a14">Navigate to Settings</text>
+
+        <!-- ↓ -->
+        <line x1="320" y1="420" x2="320" y2="450" stroke="#3d4a5c" stroke-width="2" marker-end="url(#farr)"/>
+
+        <!-- ── Select Privacy Controls ── -->
+        <rect x="215" y="450" width="210" height="44" rx="7" fill="white" stroke="#3d4a5c" stroke-width="2"/>
+        <text x="320" y="477" text-anchor="middle" font-family="Instrument Sans,sans-serif" font-size="13" font-weight="600" fill="#1e1a14">Select Privacy Controls</text>
+
+        <!-- ↓ -->
+        <line x1="320" y1="494" x2="320" y2="524" stroke="#3d4a5c" stroke-width="2" marker-end="url(#farr)"/>
+
+        <!-- ── Adjust Privacy Preferences ── -->
+        <rect x="215" y="524" width="210" height="44" rx="7" fill="white" stroke="#3d4a5c" stroke-width="2"/>
+        <text x="320" y="551" text-anchor="middle" font-family="Instrument Sans,sans-serif" font-size="13" font-weight="600" fill="#1e1a14">Adjust Privacy Preferences</text>
+
+        <!-- ↓ -->
+        <line x1="320" y1="568" x2="320" y2="598" stroke="#3d4a5c" stroke-width="2" marker-end="url(#farr)"/>
+
+        <!-- ── Preview Changes (Optional) ── -->
+        <rect x="215" y="598" width="210" height="44" rx="7" fill="white" stroke="#3d4a5c" stroke-width="2" stroke-dasharray="5,3"/>
+        <text x="320" y="620" text-anchor="middle" font-family="Instrument Sans,sans-serif" font-size="12" font-weight="600" fill="#1e1a14">Preview Changes</text>
+        <text x="320" y="636" text-anchor="middle" font-family="Instrument Sans,sans-serif" font-size="10" fill="#8a7968">(Optional)</text>
+
+        <!-- ↓ -->
+        <line x1="320" y1="642" x2="320" y2="672" stroke="#3d4a5c" stroke-width="2" marker-end="url(#farr)"/>
+
+        <!-- ── Save Settings ── -->
+        <rect x="215" y="672" width="210" height="44" rx="7" fill="white" stroke="#3d4a5c" stroke-width="2"/>
+        <text x="320" y="699" text-anchor="middle" font-family="Instrument Sans,sans-serif" font-size="13" font-weight="600" fill="#1e1a14">Save Settings</text>
+
+        <!-- ↓ -->
+        <line x1="320" y1="716" x2="320" y2="750" stroke="#3d4a5c" stroke-width="2" marker-end="url(#farr)"/>
+
+        <!-- ── Settings Saved Successfully? (diamond) ── -->
+        <polygon points="320,750 400,800 320,850 240,800" fill="white" stroke="#3d4a5c" stroke-width="2"/>
+        <text x="320" y="793" text-anchor="middle" font-family="Instrument Sans,sans-serif" font-size="10.5" font-weight="700" fill="#1e1a14">Settings</text>
+        <text x="320" y="807" text-anchor="middle" font-family="Instrument Sans,sans-serif" font-size="10.5" font-weight="700" fill="#1e1a14">Saved</text>
+        <text x="320" y="821" text-anchor="middle" font-family="Instrument Sans,sans-serif" font-size="10.5" font-weight="700" fill="#1e1a14">Successfully?</text>
+
+        <!-- No → right → Show Error & Allow Retry -->
+        <text x="430" y="794" text-anchor="middle" font-family="Instrument Sans,sans-serif" font-size="11" font-weight="800" fill="#991b1b">No</text>
+        <line x1="400" y1="800" x2="468" y2="800" stroke="#3d4a5c" stroke-width="2" marker-end="url(#farr)"/>
+        <rect x="468" y="778" width="160" height="44" rx="7" fill="#dc2626" stroke="#991b1b" stroke-width="2"/>
+        <text x="548" y="800" text-anchor="middle" font-family="Instrument Sans,sans-serif" font-size="11" font-weight="700" fill="white">Show Error &amp;</text>
+        <text x="548" y="814" text-anchor="middle" font-family="Instrument Sans,sans-serif" font-size="11" font-weight="700" fill="white">Allow Retry</text>
+
+        <!-- Yes → left → Show Success Confirmation -->
+        <text x="210" y="794" text-anchor="middle" font-family="Instrument Sans,sans-serif" font-size="11" font-weight="800" fill="#166534">Yes</text>
+        <line x1="240" y1="800" x2="172" y2="800" stroke="#3d4a5c" stroke-width="2" marker-end="url(#farr)"/>
+        <rect x="12" y="778" width="160" height="44" rx="7" fill="#16a34a" stroke="#166534" stroke-width="2"/>
+        <text x="92" y="800" text-anchor="middle" font-family="Instrument Sans,sans-serif" font-size="11" font-weight="700" fill="white">Show Success</text>
+        <text x="92" y="814" text-anchor="middle" font-family="Instrument Sans,sans-serif" font-size="11" font-weight="700" fill="white">Confirmation</text>
+
+        <!-- ↓ from Show Success to End -->
+        <line x1="92" y1="822" x2="92" y2="856" stroke="#3d4a5c" stroke-width="2" marker-end="url(#farr)"/>
+        <!-- End (pill) -->
+        <rect x="17" y="856" width="150" height="38" rx="19" fill="white" stroke="#3d4a5c" stroke-width="2"/>
+        <text x="92" y="880" text-anchor="middle" font-family="Instrument Sans,sans-serif" font-size="14" font-weight="700" fill="#1e1a14">End</text>
+
+      </svg>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- Lo-Fi Wireframes (optional) -->
+<div class="section-wrap" id="lofi">
+  <div class="section-header fade d1">
+    <div class="section-num">04</div>
+    <div class="section-title-group">
+      <div class="section-kicker">Prototype · Low-Fidelity Wireframes <span class="optional-badge">Optional</span></div>
+      <h2>Sketching the Screens</h2>
+      <p class="section-desc">Low-fidelity wireframes for the three core screens — focusing on layout logic and information hierarchy before investing in visual polish. These were used to validate the structure with the IA before moving to hi-fi.</p>
+    </div>
+  </div>
+
+  <div class="lofi-grid fade d2">
+    <div class="lofi-frame">
+      <div class="lofi-screen">
+        <div class="lofi-bar" style="height:14px;width:60%;margin-bottom:4px;"></div>
+        <div class="lofi-bar" style="height:8px;width:40%;margin-bottom:12px;opacity:0.5;"></div>
+        <div style="display:flex;gap:6px;margin-bottom:10px;">
+          <div class="lofi-bar" style="height:52px;flex:1;border-radius:8px;"></div>
+          <div class="lofi-bar" style="height:52px;flex:1;border-radius:8px;"></div>
+          <div class="lofi-bar" style="height:52px;flex:1;border-radius:8px;"></div>
+        </div>
+        <div class="lofi-bar" style="height:10px;width:100%;margin-bottom:6px;opacity:0.4;"></div>
+        <div class="lofi-bar" style="height:10px;width:85%;margin-bottom:6px;opacity:0.4;"></div>
+        <div class="lofi-bar" style="height:10px;width:70%;opacity:0.4;"></div>
+      </div>
+      <div class="lofi-caption">
+        <div class="lofi-caption-title">Screen 1 — Gateway Home</div>
+        <div class="lofi-caption-desc">Category cards + status overview + search bar at top.</div>
+      </div>
+    </div>
+    <div class="lofi-frame">
+      <div class="lofi-screen">
+        <div class="lofi-bar" style="height:28px;width:100%;border-radius:6px;margin-bottom:12px;"></div>
+        <div class="lofi-bar" style="height:10px;width:50%;margin-bottom:16px;opacity:0.4;"></div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div class="lofi-bar" style="height:36px;width:36px;border-radius:50%;flex-shrink:0;"></div>
+            <div style="flex:1;">
+              <div class="lofi-bar" style="height:8px;width:80%;margin-bottom:4px;opacity:0.6;"></div>
+              <div class="lofi-bar" style="height:6px;width:50%;opacity:0.3;"></div>
+            </div>
+            <div class="lofi-bar" style="height:20px;width:36px;border-radius:10px;flex-shrink:0;"></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div class="lofi-bar" style="height:36px;width:36px;border-radius:50%;flex-shrink:0;"></div>
+            <div style="flex:1;">
+              <div class="lofi-bar" style="height:8px;width:70%;margin-bottom:4px;opacity:0.6;"></div>
+              <div class="lofi-bar" style="height:6px;width:45%;opacity:0.3;"></div>
+            </div>
+            <div class="lofi-bar" style="height:20px;width:36px;border-radius:10px;flex-shrink:0;"></div>
+          </div>
+        </div>
+      </div>
+      <div class="lofi-caption">
+        <div class="lofi-caption-title">Screen 2 — Privacy Controls</div>
+        <div class="lofi-caption-desc">Flat list of settings with toggle switches and plain-language labels.</div>
+      </div>
+    </div>
+    <div class="lofi-frame">
+      <div class="lofi-screen">
+        <div class="lofi-bar" style="height:12px;width:30%;margin-bottom:8px;opacity:0.5;"></div>
+        <div class="lofi-bar" style="height:18px;width:70%;margin-bottom:12px;"></div>
+        <div class="lofi-bar" style="height:8px;width:100%;margin-bottom:4px;opacity:0.3;"></div>
+        <div class="lofi-bar" style="height:8px;width:90%;margin-bottom:16px;opacity:0.3;"></div>
+        <div style="display:flex;gap:8px;margin-bottom:10px;">
+          <div class="lofi-bar" style="height:28px;flex:1;border-radius:6px;background:var(--terra);opacity:0.4;"></div>
+          <div class="lofi-bar" style="height:28px;flex:1;border-radius:6px;"></div>
+        </div>
+        <div class="lofi-bar" style="height:8px;width:60%;opacity:0.25;"></div>
+      </div>
+      <div class="lofi-caption">
+        <div class="lofi-caption-title">Screen 3 — Setting Detail</div>
+        <div class="lofi-caption-desc">Expanded setting view with description, current status, and action buttons.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- MVP Scope -->
+<div class="section-wrap" id="mvp">
+  <div class="section-header fade d1">
+    <div class="section-num">04</div>
+    <div class="section-title-group">
+      <div class="section-kicker">Prototype · MVP Scope</div>
+      <h2>Defining What to Build</h2>
+      <p class="section-desc">Scoping the minimum viable product — deciding what the Accounts Gateway must deliver in its first release, and what to defer.</p>
+    </div>
+  </div>
+  <div class="mvp-grid fade d2">
+    <div class="mvp-card">
+      <div class="mvp-card-title must">✅ Must Haves</div>
+      <div class="mvp-item"><div class="mvp-tick yes">✓</div> Unified privacy & settings hub (one screen)</div>
+      <div class="mvp-item"><div class="mvp-tick yes">✓</div> Flat category navigation (Privacy, Security, Notifications, Data)</div>
+      <div class="mvp-item"><div class="mvp-tick yes">✓</div> Inline privacy status indicators (🟢 Private / 🔴 Public)</div>
+      <div class="mvp-item"><div class="mvp-tick yes">✓</div> Global search / filter for settings (⌘K)</div>
+      <div class="mvp-item"><div class="mvp-tick yes">✓</div> Plain-language descriptions for every control</div>
+    </div>
+    <div class="mvp-card">
+      <div class="mvp-card-title wont">✕ Won't Have (v1)</div>
+      <div class="mvp-item"><div class="mvp-tick no">✕</div> AI-powered setting recommendations</div>
+      <div class="mvp-item"><div class="mvp-tick no">✕</div> Cross-platform privacy sync (Messenger, Instagram)</div>
+      <div class="mvp-item"><div class="mvp-tick no">✕</div> Detailed data-usage analytics dashboard</div>
+      <div class="mvp-item"><div class="mvp-tick no">✕</div> Multi-language localisation</div>
+      <div class="mvp-item"><div class="mvp-tick no">✕</div> Advanced permission scheduling</div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- STEP 6: Wireframe / Prototype -->
+<div class="section-wrap" id="wireframe">
+  <div class="section-header fade d1">
+    <div class="section-num">04</div>
+    <div class="section-title-group">
+      <div class="section-kicker">Prototype · High-Fidelity Prototype</div>
+      <h2>Facebook Privacy Redesign</h2>
+      <p class="section-desc">Three high-fidelity screens built in Google AI Studio — translating every research insight into a working interface. Each design decision is traceable back to a specific pain point or HMW question.</p>
+    </div>
+  </div>
+
+  <!-- Main showcase: phone + feature panel -->
+  <div class="proto-showcase fade d2">
+
+    <!-- Phone mockup -->
+    <div class="phone-stage">
+      <div class="phone-frame">
+        <div class="phone-notch"></div>
+        <div class="phone-screen" id="phoneScreen">
+
+          <!-- SCREEN 1: Home / Accounts Gateway -->
+          <div class="pscreen active" id="ps1">
+            <div style="background:#1877f2;padding:14px 16px 10px;display:flex;align-items:center;justify-content:space-between;">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <div style="width:22px;height:22px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:0.65rem;color:#1877f2;">f</div>
+                <span style="font-weight:700;font-size:0.82rem;color:white;">Accounts Gateway</span>
+              </div>
+              <div style="display:flex;gap:6px;">
+                <div style="width:24px;height:24px;background:rgba(255,255,255,0.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.65rem;">🔔</div>
+                <div style="width:24px;height:24px;background:rgba(255,255,255,0.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.65rem;">👤</div>
+              </div>
+            </div>
+            <div style="padding:14px 14px 10px;background:#f0f2f5;flex:1;">
+              <div style="background:white;border-radius:12px;padding:14px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,0.08);">
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+                  <div style="width:36px;height:36px;background:linear-gradient(135deg,#1877f2,#0d5bc4);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:900;font-size:1rem;">S</div>
+                  <div>
+                    <div style="font-weight:700;font-size:0.78rem;color:#1c1e21;">Sarah Mitchell</div>
+                    <div style="font-size:0.65rem;color:#65676b;">Make-up Artist · Account active</div>
+                  </div>
+                  <div style="margin-left:auto;font-size:0.65rem;background:#e7f3e8;color:#1a7f37;padding:3px 8px;border-radius:10px;font-weight:600;">Secure ✓</div>
+                </div>
+                <div style="display:flex;gap:6px;">
+                  <div style="flex:1;background:#f0f2f5;border-radius:8px;padding:8px;text-align:center;">
+                    <div style="font-size:0.9rem;margin-bottom:3px;">🔒</div>
+                    <div style="font-size:0.6rem;font-weight:700;color:#1c1e21;">Privacy</div>
+                    <div style="font-size:0.55rem;color:#65676b;">3 alerts</div>
+                  </div>
+                  <div style="flex:1;background:#f0f2f5;border-radius:8px;padding:8px;text-align:center;">
+                    <div style="font-size:0.9rem;margin-bottom:3px;">🛡️</div>
+                    <div style="font-size:0.6rem;font-weight:700;color:#1c1e21;">Security</div>
+                    <div style="font-size:0.55rem;color:#65676b;">All good</div>
+                  </div>
+                  <div style="flex:1;background:#e7f0fe;border-radius:8px;padding:8px;text-align:center;border:1.5px solid #1877f2;">
+                    <div style="font-size:0.9rem;margin-bottom:3px;">👁️</div>
+                    <div style="font-size:0.6rem;font-weight:700;color:#1877f2;">Vault</div>
+                    <div style="font-size:0.55rem;color:#1877f2;">My data</div>
+                  </div>
+                </div>
+              </div>
+              <div style="font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#65676b;margin-bottom:6px;">Quick Access</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+                <div style="background:white;border-radius:10px;padding:10px;box-shadow:0 1px 3px rgba(0,0,0,0.07);display:flex;align-items:center;gap:7px;">
+                  <div style="font-size:0.85rem;">🔕</div>
+                  <div><div style="font-size:0.65rem;font-weight:700;color:#1c1e21;">Notifications</div><div style="font-size:0.58rem;color:#65676b;">Manage</div></div>
+                </div>
+                <div style="background:white;border-radius:10px;padding:10px;box-shadow:0 1px 3px rgba(0,0,0,0.07);display:flex;align-items:center;gap:7px;">
+                  <div style="font-size:0.85rem;">🚫</div>
+                  <div><div style="font-size:0.65rem;font-weight:700;color:#1c1e21;">Blocking</div><div style="font-size:0.58rem;color:#65676b;">2 blocked</div></div>
+                </div>
+                <div style="background:white;border-radius:10px;padding:10px;box-shadow:0 1px 3px rgba(0,0,0,0.07);display:flex;align-items:center;gap:7px;">
+                  <div style="font-size:0.85rem;">📢</div>
+                  <div><div style="font-size:0.65rem;font-weight:700;color:#1c1e21;">Ad Prefs</div><div style="font-size:0.58rem;color:#65676b;">Manage</div></div>
+                </div>
+                <div style="background:white;border-radius:10px;padding:10px;box-shadow:0 1px 3px rgba(0,0,0,0.07);display:flex;align-items:center;gap:7px;">
+                  <div style="font-size:0.85rem;">📱</div>
+                  <div><div style="font-size:0.65rem;font-weight:700;color:#1c1e21;">Sessions</div><div style="font-size:0.58rem;color:#65676b;">1 device</div></div>
+                </div>
+              </div>
+            </div>
+            <div style="background:white;border-top:1px solid #e4e6eb;padding:8px;display:flex;justify-content:space-around;">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:2px;"><div style="font-size:1rem;">🏠</div><div style="font-size:0.52rem;color:#1877f2;font-weight:700;">Home</div></div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:2px;"><div style="font-size:1rem;">🔒</div><div style="font-size:0.52rem;color:#65676b;">Privacy</div></div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:2px;"><div style="font-size:1rem;">👤</div><div style="font-size:0.52rem;color:#65676b;">Profile</div></div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:2px;"><div style="font-size:1rem;">⚙️</div><div style="font-size:0.52rem;color:#65676b;">Settings</div></div>
+            </div>
+          </div>
+
+          <!-- SCREEN 2: Quick Settings Grid -->
+          <div class="pscreen" id="ps2">
+            <div style="background:white;padding:12px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #e4e6eb;">
+              <div style="font-size:1rem;">←</div>
+              <span style="font-weight:700;font-size:0.85rem;color:#1c1e21;">Privacy &amp; Settings</span>
+              <div style="margin-left:auto;width:28px;height:28px;background:#f0f2f5;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.72rem;">⌘K</div>
+            </div>
+            <div style="padding:12px;background:#f0f2f5;flex:1;overflow:hidden;">
+              <div style="font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#65676b;margin-bottom:8px;">Most Used Settings</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:12px;">
+                <div style="background:#e7f0fe;border-radius:10px;padding:10px 6px;text-align:center;border:1.5px solid #1877f2;">
+                  <div style="font-size:1.1rem;margin-bottom:4px;">🔒</div>
+                  <div style="font-size:0.6rem;font-weight:700;color:#1877f2;">Privacy</div>
+                </div>
+                <div style="background:white;border-radius:10px;padding:10px 6px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,0.07);">
+                  <div style="font-size:1.1rem;margin-bottom:4px;">🛡️</div>
+                  <div style="font-size:0.6rem;font-weight:700;color:#1c1e21;">Security</div>
+                </div>
+                <div style="background:white;border-radius:10px;padding:10px 6px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,0.07);">
+                  <div style="font-size:1.1rem;margin-bottom:4px;">🔔</div>
+                  <div style="font-size:0.6rem;font-weight:700;color:#1c1e21;">Notifs</div>
+                </div>
+                <div style="background:white;border-radius:10px;padding:10px 6px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,0.07);">
+                  <div style="font-size:1.1rem;margin-bottom:4px;">📢</div>
+                  <div style="font-size:0.6rem;font-weight:700;color:#1c1e21;">Ads</div>
+                </div>
+                <div style="background:white;border-radius:10px;padding:10px 6px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,0.07);">
+                  <div style="font-size:1.1rem;margin-bottom:4px;">📱</div>
+                  <div style="font-size:0.6rem;font-weight:700;color:#1c1e21;">Sessions</div>
+                </div>
+                <div style="background:white;border-radius:10px;padding:10px 6px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,0.07);">
+                  <div style="font-size:1.1rem;margin-bottom:4px;">🚫</div>
+                  <div style="font-size:0.6rem;font-weight:700;color:#1c1e21;">Blocking</div>
+                </div>
+              </div>
+              <div style="font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#65676b;margin-bottom:8px;">Privacy Controls</div>
+              <div style="background:white;border-radius:10px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.07);">
+                <div style="padding:10px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #f0f2f5;">
+                  <div style="font-size:0.68rem;color:#1c1e21;font-weight:500;">Who sees your posts</div>
+                  <div style="font-size:0.6rem;background:#e7f0fe;color:#1877f2;padding:2px 7px;border-radius:8px;font-weight:600;">Friends</div>
+                </div>
+                <div style="padding:10px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #f0f2f5;">
+                  <div style="font-size:0.68rem;color:#1c1e21;font-weight:500;">Who can send requests</div>
+                  <div style="font-size:0.6rem;background:#e7f0fe;color:#1877f2;padding:2px 7px;border-radius:8px;font-weight:600;">Everyone</div>
+                </div>
+                <div style="padding:10px 12px;display:flex;align-items:center;justify-content:space-between;">
+                  <div style="font-size:0.68rem;color:#1c1e21;font-weight:500;">Profile search visibility</div>
+                  <div style="font-size:0.6rem;background:#e7f3e8;color:#1a7f37;padding:2px 7px;border-radius:8px;font-weight:600;">Private</div>
+                </div>
+              </div>
+            </div>
+            <div style="background:white;border-top:1px solid #e4e6eb;padding:8px;display:flex;justify-content:space-around;">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:2px;"><div style="font-size:1rem;">🏠</div><div style="font-size:0.52rem;color:#65676b;">Home</div></div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:2px;"><div style="font-size:1rem;">🔒</div><div style="font-size:0.52rem;color:#1877f2;font-weight:700;">Privacy</div></div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:2px;"><div style="font-size:1rem;">👤</div><div style="font-size:0.52rem;color:#65676b;">Profile</div></div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:2px;"><div style="font-size:1rem;">⚙️</div><div style="font-size:0.52rem;color:#65676b;">Settings</div></div>
+            </div>
+          </div>
+
+          <!-- SCREEN 3: AI Help Panel -->
+          <div class="pscreen" id="ps3">
+            <div style="background:white;padding:12px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #e4e6eb;">
+              <span style="font-weight:700;font-size:0.85rem;color:#1c1e21;">AI Help</span>
+              <div style="margin-left:auto;font-size:0.65rem;background:#f0f2f5;padding:3px 10px;border-radius:8px;color:#65676b;font-weight:600;">⌘K Shortcut</div>
+            </div>
+            <div style="padding:12px;background:#f0f2f5;flex:1;overflow:hidden;">
+              <div style="background:white;border-radius:12px;padding:12px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,0.08);">
+                <div style="display:flex;align-items:center;gap:6px;background:#f0f2f5;border-radius:8px;padding:8px 10px;margin-bottom:10px;">
+                  <div style="font-size:0.8rem;">🔍</div>
+                  <div style="font-size:0.7rem;color:#65676b;">How do I hide my phone number?</div>
+                </div>
+                <div style="display:flex;gap:6px;align-items:flex-start;">
+                  <div style="width:22px;height:22px;background:linear-gradient(135deg,#7c6aad,#a593d2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.6rem;color:white;flex-shrink:0;">AI</div>
+                  <div style="font-size:0.68rem;color:#1c1e21;line-height:1.5;background:#f0f2f5;border-radius:8px;padding:8px;">
+                    Go to <strong>Privacy → Contact Info</strong>. Under "Phone Number", set visibility to <strong>Only Me</strong>.
+                    <div style="margin-top:6px;display:flex;gap:4px;">
+                      <div style="background:#1877f2;color:white;font-size:0.58rem;font-weight:700;padding:3px 8px;border-radius:6px;">Take me there →</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div style="font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#65676b;margin-bottom:6px;">Suggested Questions</div>
+              <div style="display:flex;flex-direction:column;gap:5px;">
+                <div style="background:white;border-radius:8px;padding:8px 10px;font-size:0.65rem;color:#1877f2;font-weight:500;box-shadow:0 1px 3px rgba(0,0,0,0.06);">How do I stop apps from accessing my data?</div>
+                <div style="background:white;border-radius:8px;padding:8px 10px;font-size:0.65rem;color:#1877f2;font-weight:500;box-shadow:0 1px 3px rgba(0,0,0,0.06);">Who can see my friends list?</div>
+                <div style="background:white;border-radius:8px;padding:8px 10px;font-size:0.65rem;color:#1877f2;font-weight:500;box-shadow:0 1px 3px rgba(0,0,0,0.06);">How do I turn off face recognition?</div>
+              </div>
+            </div>
+            <div style="background:white;border-top:1px solid #e4e6eb;padding:8px;display:flex;justify-content:space-around;">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:2px;"><div style="font-size:1rem;">🏠</div><div style="font-size:0.52rem;color:#65676b;">Home</div></div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:2px;"><div style="font-size:1rem;">🔒</div><div style="font-size:0.52rem;color:#65676b;">Privacy</div></div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:2px;"><div style="font-size:1rem;">👤</div><div style="font-size:0.52rem;color:#65676b;">Profile</div></div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:2px;"><div style="font-size:1rem;">🤖</div><div style="font-size:0.52rem;color:#1877f2;font-weight:700;">AI Help</div></div>
+            </div>
+          </div>
+
+        </div>
+        <div class="phone-home-bar"></div>
+      </div>
+      <!-- Decorative glow -->
+      <div class="phone-glow"></div>
+    </div>
+
+    <!-- Feature panel -->
+    <div class="proto-panel">
+      <!-- Screen tabs -->
+      <div class="proto-tabs">
+        <button class="proto-tab active" onclick="switchScreen(1, this)">
+          <span class="pt-num">01</span>
+          <span class="pt-label">Home Gateway</span>
+        </button>
+        <button class="proto-tab" onclick="switchScreen(2, this)">
+          <span class="pt-num">02</span>
+          <span class="pt-label">Settings Grid</span>
+        </button>
+        <button class="proto-tab" onclick="switchScreen(3, this)">
+          <span class="pt-num">03</span>
+          <span class="pt-label">AI Help</span>
+        </button>
+      </div>
+
+      <!-- Screen 1 info -->
+      <div class="proto-info active" id="pi1">
+        <div class="pi-eyebrow">Screen 01 · Accounts Gateway</div>
+        <div class="pi-title">One hub. Everything visible.</div>
+        <p class="pi-body">The redesigned home screen surfaces Privacy, Security, and Identity Vault at the top level — eliminating the need to dig through five nested menus to reach a single control.</p>
+        <div class="pi-chips">
+          <span class="pi-chip research">📋 Research insight</span>
+          <span class="pi-chip design">Users avoid deep settings hierarchies</span>
+        </div>
+        <div class="pi-features">
+          <div class="pi-feat"><div class="pi-feat-icon" style="background:rgba(196,98,45,0.1);">🔒</div><div><strong>Unified Privacy Hub</strong> — all controls one tap away</div></div>
+          <div class="pi-feat"><div class="pi-feat-icon" style="background:rgba(212,149,42,0.1);">👤</div><div><strong>Identity Vault</strong> — personal data separated from settings</div></div>
+          <div class="pi-feat"><div class="pi-feat-icon" style="background:rgba(91,154,110,0.1);">✅</div><div><strong>Live security status</strong> — instant visibility at a glance</div></div>
+        </div>
+      </div>
+
+      <!-- Screen 2 info -->
+      <div class="proto-info" id="pi2">
+        <div class="pi-eyebrow">Screen 02 · Quick Settings Grid</div>
+        <div class="pi-title">Six settings. One screen.</div>
+        <p class="pi-body">The most-used settings — Privacy, Security, Notifications, Ads, Sessions, Blocking — are laid out in a scannable 3×2 grid. No more hunting through category trees.</p>
+        <div class="pi-chips">
+          <span class="pi-chip research">📋 Research insight</span>
+          <span class="pi-chip design">Settings complexity drives avoidance</span>
+        </div>
+        <div class="pi-features">
+          <div class="pi-feat"><div class="pi-feat-icon" style="background:rgba(196,98,45,0.1);">⚡</div><div><strong>3×2 grid layout</strong> — every major setting visible instantly</div></div>
+          <div class="pi-feat"><div class="pi-feat-icon" style="background:rgba(212,149,42,0.1);">🎨</div><div><strong>Colour-coded states</strong> — active setting highlighted in blue</div></div>
+          <div class="pi-feat"><div class="pi-feat-icon" style="background:rgba(91,154,110,0.1);">📊</div><div><strong>Inline status tags</strong> — current value shown without opening</div></div>
+        </div>
+      </div>
+
+      <!-- Screen 3 info -->
+      <div class="proto-info" id="pi3">
+        <div class="pi-eyebrow">Screen 03 · AI Help Panel</div>
+        <div class="pi-title">Ask, don't search.</div>
+        <p class="pi-body">A Cmd+K powered assistant lets users describe what they want in plain language — "hide my phone number" — and gets a direct path to the right setting, with a one-tap shortcut.</p>
+        <div class="pi-chips">
+          <span class="pi-chip research">📋 Research insight</span>
+          <span class="pi-chip design">Users can't name settings they need</span>
+        </div>
+        <div class="pi-features">
+          <div class="pi-feat"><div class="pi-feat-icon" style="background:rgba(124,106,173,0.1);">🤖</div><div><strong>Natural language search</strong> — describe what you want to do</div></div>
+          <div class="pi-feat"><div class="pi-feat-icon" style="background:rgba(196,98,45,0.1);">➡️</div><div><strong>Direct navigation</strong> — "Take me there" button jumps straight in</div></div>
+          <div class="pi-feat"><div class="pi-feat-icon" style="background:rgba(212,149,42,0.1);">💡</div><div><strong>Smart suggestions</strong> — surfaces common privacy questions proactively</div></div>
+        </div>
+      </div>
+
+      <!-- CTA -->
+      <div class="proto-cta">
+        <a href="https://ai.studio/apps/08a0a7ce-465e-4037-8021-26880e3329a9" target="_blank" class="proto-btn" style="margin-top:0;">View Live Prototype ↗</a>
+        <div class="proto-badge">🛠 Google AI Studio · Hi-Fi Wireframe · <span style="color:var(--terra);font-weight:700;">Live ✓</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Design decisions strip -->
+  <div class="design-decisions fade d3">
+    <div class="dd-label">Design Decisions</div>
+    <div class="dd-grid">
+      <div class="dd-card">
+        <div class="dd-from">😕 Before</div>
+        <div class="dd-arrow">→</div>
+        <div class="dd-to">✅ After</div>
+        <div class="dd-desc">Nested menus 5 levels deep</div>
+        <div class="dd-arrow-v">↓</div>
+        <div class="dd-desc after">Top-level hub with flat hierarchy</div>
+      </div>
+      <div class="dd-card">
+        <div class="dd-from">😕 Before</div>
+        <div class="dd-arrow">→</div>
+        <div class="dd-to">✅ After</div>
+        <div class="dd-desc">No search for settings</div>
+        <div class="dd-arrow-v">↓</div>
+        <div class="dd-desc after">AI natural language search (⌘K)</div>
+      </div>
+      <div class="dd-card">
+        <div class="dd-from">😕 Before</div>
+        <div class="dd-arrow">→</div>
+        <div class="dd-to">✅ After</div>
+        <div class="dd-desc">Privacy buried in general settings</div>
+        <div class="dd-arrow-v">↓</div>
+        <div class="dd-desc after">Privacy &amp; Identity Vault as top-level nav</div>
+      </div>
+      <div class="dd-card">
+        <div class="dd-from">😕 Before</div>
+        <div class="dd-arrow">→</div>
+        <div class="dd-to">✅ After</div>
+        <div class="dd-desc">No current status visible at glance</div>
+        <div class="dd-arrow-v">↓</div>
+        <div class="dd-desc after">Inline status tags on every setting</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- STEP 7: Checklist -->
+<div class="section-wrap" id="checklist">
+  <div class="section-header fade d1">
+    <div class="section-num">05</div>
+    <div class="section-title-group">
+      <div class="section-kicker">Review · Submission Checklist</div>
+      <h2>What's Been Done</h2>
+      <p class="section-desc">A full record of every deliverable completed across all four phases — click any item to toggle its status.</p>
+    </div>
+  </div>
+  <div class="checklist-wrap fade d2">
+    <div class="cl-head">
+      <div class="cl-head-title">Checkpoint 1 Requirements</div>
+      <div class="cl-progress" id="prog">Click to track progress</div>
+    </div>
+    <div class="cl-item" onclick="toggle(this)">
+      <div class="cl-box done">✓</div>
+      <div><div class="cl-label">01 Empathize — Pain Points Gathering</div><div class="cl-desc">5 pain points logged including Shopee pop-up ads — each with title, trigger, emotion, and severity.</div></div>
+    </div>
+    <div class="cl-item" onclick="toggle(this)">
+      <div class="cl-box done">✓</div>
+      <div><div class="cl-label">01 Empathize — The 5 Whys</div><div class="cl-desc">Root cause analysis drilling from symptom (users avoid settings) to root (goals focus on quantity, creating UX blind spots).</div></div>
+    </div>
+    <div class="cl-item" onclick="toggle(this)">
+      <div class="cl-box done">✓</div>
+      <div><div class="cl-label">01 Empathize — Causal Loop Diagram (CLD)</div><div class="cl-desc">Causal loop diagram mapping the feature expansion → complexity → confusion → avoidance reinforcing cycle.</div></div>
+    </div>
+    <div class="cl-item" onclick="toggle(this)">
+      <div class="cl-box done">✓</div>
+      <div><div class="cl-label">01 Empathize — Empathy Map</div><div class="cl-desc">Sarah Mitchell's full Says / Thinks / Does / Feels quadrant map derived from research.</div></div>
+    </div>
+    <div class="cl-item" onclick="toggle(this)">
+      <div class="cl-box done">✓</div>
+      <div><div class="cl-label">02 Define — Persona Creation</div><div class="cl-desc">Sarah Mitchell persona with goals, frustrations, and behavioral patterns built from CLD insights.</div></div>
+    </div>
+    <div class="cl-item" onclick="toggle(this)">
+      <div class="cl-box done">✓</div>
+      <div><div class="cl-label">02 Define — Point of View (POV) Statement</div><div class="cl-desc">User + Need + Insight framed as a clear problem statement anchoring all design decisions.</div></div>
+    </div>
+    <div class="cl-item" onclick="toggle(this)">
+      <div class="cl-box done">✓</div>
+      <div><div class="cl-label">02 Define — How Might We (HMW) Questions</div><div class="cl-desc">4 HMW questions reframing pain points as design opportunities mapped to research findings.</div></div>
+    </div>
+    <div class="cl-item" onclick="toggle(this)">
+      <div class="cl-box done">✓</div>
+      <div><div class="cl-label">02 Define — User Stories</div><div class="cl-desc">4 user stories with Must / Should / Could priority levels and acceptance criteria.</div></div>
+    </div>
+    <div class="cl-item" onclick="toggle(this)">
+      <div class="cl-box done">✓</div>
+      <div><div class="cl-label">03 Ideate — Crazy 8s</div><div class="cl-desc">8 rapid design ideas generated — Privacy Hub, Smart Search, Traffic Light Status, and more.</div></div>
+    </div>
+    <div class="cl-item" onclick="toggle(this)">
+      <div class="cl-box done">✓</div>
+      <div><div class="cl-label">03 Ideate — Selection &amp; Storyboard <span class="optional-badge">Optional</span></div><div class="cl-desc">Top 3 ideas selected and combined; 5-frame storyboard tracing Sarah's journey to success.</div></div>
+    </div>
+    <div class="cl-item" onclick="toggle(this)">
+      <div class="cl-box done">✓</div>
+      <div><div class="cl-label">04 Prototype — IA &amp; User Flow</div><div class="cl-desc">Sitemap of Accounts Gateway with 4 category tabs; happy path flow from open to saved settings.</div></div>
+    </div>
+    <div class="cl-item" onclick="toggle(this)">
+      <div class="cl-box done">✓</div>
+      <div><div class="cl-label">04 Prototype — Low-Fidelity Wireframes <span class="optional-badge">Optional</span></div><div class="cl-desc">3 lo-fi wireframe screens: Gateway Home, Privacy Controls list, and Setting Detail view.</div></div>
+    </div>
+    <div class="cl-item" onclick="toggle(this)">
+      <div class="cl-box done">✓</div>
+      <div><div class="cl-label">04 Prototype — High-Fidelity Prototype</div><div class="cl-desc">Accounts Gateway built in Google AI Studio — quick-access settings hub with live prototype link.</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<footer>
+  <div class="footer-brand">UX Portfolio</div>
+  <div class="footer-text">Facebook Privacy &amp; Settings Redesign · Accounts Gateway Concept · UX Case Study</div>
+</footer>
+
+<script>
+/* ── Prototype screen switcher ── */
+function switchScreen(n, btn) {
+  document.querySelectorAll('.pscreen').forEach(s => { s.style.display = 'none'; s.style.opacity = '0'; });
+  const screen = document.getElementById('ps' + n);
+  screen.style.display = 'flex';
+  requestAnimationFrame(() => { screen.style.opacity = '1'; });
+  document.querySelectorAll('.proto-info').forEach(p => p.classList.remove('active'));
+  document.getElementById('pi' + n).classList.add('active');
+  document.querySelectorAll('.proto-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+/* ── Checklist ── */
+function toggle(item) {
+  const box = item.querySelector('.cl-box');
+  if (box.classList.contains('done')) { box.classList.remove('done'); box.textContent = ''; }
+  else { box.classList.remove('partial'); box.classList.add('done'); box.textContent = '✓'; }
+  updateProg();
+}
+function updateProg() {
+  const total = document.querySelectorAll('.cl-item').length;
+  const done  = document.querySelectorAll('.cl-box.done').length;
+  document.getElementById('prog').textContent = `${done} / ${total} complete`;
+}
+updateProg();
+
+/* ── Smooth scroll for ALL anchor links ── */
+document.addEventListener('click', e => {
+  const a = e.target.closest('a[href^="#"]');
+  if (!a) return;
+  const target = document.querySelector(a.getAttribute('href'));
+  if (!target) return;
+  e.preventDefault();
+  const offset = 70; // nav height
+  const top = target.getBoundingClientRect().top + window.scrollY - offset;
+  window.scrollTo({ top, behavior: 'smooth' });
+});
+
+/* ── Phase sections & their anchor IDs ── */
+const phases = [
+  { id: 'empathize', pill: 0, nav: 0 },
+  { id: 'define',    pill: 1, nav: 1 },
+  { id: 'ideate',    pill: 2, nav: 2 },
+  { id: 'prototype', pill: 3, nav: 3 },
+  { id: 'checklist', pill: 4, nav: 4 },
+];
+
+const pills   = Array.from(document.querySelectorAll('.step-pill'));
+const navLinks = Array.from(document.querySelectorAll('.nav-links a'));
+
+function updateActiveState() {
+  const scrollY = window.scrollY + 80;
+  let activeIdx = 0;
+
+  phases.forEach((phase, i) => {
+    const el = document.getElementById(phase.id);
+    if (el && el.getBoundingClientRect().top + window.scrollY <= scrollY) {
+      activeIdx = i;
+    }
+  });
+
+  /* Update step pills */
+  pills.forEach((p, i) => {
+    p.classList.toggle('active', i === activeIdx);
+    p.classList.toggle('done', i < activeIdx);
+  });
+
+  /* Update nav links */
+  navLinks.forEach((a, i) => {
+    a.classList.toggle('nav-active', i === activeIdx);
+  });
+}
+
+window.addEventListener('scroll', updateActiveState, { passive: true });
+updateActiveState();
+</script>
+</body>
+</html>
